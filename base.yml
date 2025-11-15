@@ -23,3 +23,9 @@ services:
     image: "selenium/standalone-firefox${MOODLE_DOCKER_SELENIUM_SUFFIX:-}:${MOODLE_DOCKER_BROWSER_TAG}"
     volumes:
       - "${MOODLE_DOCKER_WWWROOT}:/var/www/html:ro"
+  docker_moodle-coderunner:
+    container_name: docker_moodle-coderunner
+    image: trampgeek/jobeinabox
+    restart: always
+    ports:
+      - "4000:80"
