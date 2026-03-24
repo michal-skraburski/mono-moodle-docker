@@ -14,16 +14,24 @@
 \newcommand{\coursename}{CS408: Individual Project}
 \newcommand{\deptname}{Computer and Information Sciences}
 
+\usepackage{amsmath} % fix stupid warning
+\usepackage{amssymb}
+\usepackage{sansmathfonts}
+\usepackage{slantsc}
+
+\renewcommand{\familydefault}{\sfdefault}
+\DeclareFontSeriesDefault[sf]{bf}{bx}
+
 \begin{document}
 
 %--------------------------------
 % Title page.
 %--------------------------------
 \begin{titlepage}
-\vspace*{5mm}
-\titletext{Insert dissertation title here, using\\ manual line breaks if necessary}
+\vspace{5mm}
+\titletext{Improving Automated Assessment}
 \vspace{10mm}
-\authortext{A Student}
+\authortext{Michal Skraburski}
 \vspace{15mm}
 \degreetext{\degreename}{\coursename}
 \vspace{40mm}
@@ -64,9 +72,10 @@
 %    Conclusion
 
 %References
-%Appendices
+%Appendices-
 
 \input{sections/abstract}
+hello
 
 %\input{sections/declaration}
 \clearpage
