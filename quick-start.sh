@@ -1,6 +1,7 @@
 # Change ./moodle to your /path/to/moodle if you already have it checked out
 export MOODLE_DOCKER_WWWROOT=./moodle
-
+export CODERUNNER_REPO=../moodle-qtype_coderunner/
+export CR_DEPEND_REPO=../moodle-qbehaviour_adaptive_adapted_for_coderunner/
 # Choose a db server (Currently supported: pgsql, mariadb, mysql, mssql, oracle)
 export MOODLE_DOCKER_DB=pgsql
 

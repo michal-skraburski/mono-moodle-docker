@@ -4,6 +4,8 @@ services:
     depends_on:
       - db
     volumes:
+      - "${CR_DEPEND_REPO}:/var/www/html/question/behaviour/adaptive_adapted_for_coderunner"
+#      - "${CODERUNNER_REPO}:/var/www/html/question/type/coderunner"
       - "${MOODLE_DOCKER_WWWROOT}:/var/www/html"
       - "${ASSETDIR}/web/apache2_faildumps.conf:/etc/apache2/conf-enabled/moodle-faildump.conf"
     environment:
@@ -25,7 +27,7 @@ services:
       - "${MOODLE_DOCKER_WWWROOT}:/var/www/html:ro"
   docker_moodle-coderunner:
     container_name: docker_moodle-coderunner
-    image: trampgeek/jobeinabox
+    image: jobeinabox
     restart: always
     ports:
       - "4000:80"
