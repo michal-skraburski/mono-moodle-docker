@@ -27,7 +27,7 @@ services:
       - "${MOODLE_DOCKER_WWWROOT}:/var/www/html:ro"
   docker_moodle-coderunner:
     container_name: docker_moodle-coderunner
-    image: jobeinabox
+    image: trampgeek/jobeinabox
     restart: always
     ports:
       - "4000:80"
