@@ -5,7 +5,7 @@ services:
       - db
     volumes:
       - "${CR_DEPEND_REPO}:/var/www/html/question/behaviour/adaptive_adapted_for_coderunner"
-#      - "${CODERUNNER_REPO}:/var/www/html/question/type/coderunner"
+      - "${CODERUNNER_REPO}:/var/www/html/question/type/coderunner"
       - "${MOODLE_DOCKER_WWWROOT}:/var/www/html"
       - "${ASSETDIR}/web/apache2_faildumps.conf:/etc/apache2/conf-enabled/moodle-faildump.conf"
     environment:
