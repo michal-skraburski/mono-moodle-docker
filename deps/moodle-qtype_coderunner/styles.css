@@ -522,6 +522,29 @@ li.bulktest.coderunner.context.quiz {
     outline-color: rgba(0, 0, 0, 0.5);
 }
 
+/* Michal S changes */
+
+
+body#page-question-type-coderunner div[id^=id_testcasehdrcontainer] {
+  /* Center the div within the layout margins */
+  margin-left:18px;
+  margin-right:18px;
+}
+body#page-question-type-coderunner div[id^=fitem_id_testcode] {
+  /* Pad the first test case to even out the padding */ 
+  padding-top:18px !important;
+
+  /* Round the top of first part of testcase */
+  border-radius: 0.5rem 0.5rem 0px 0px;
+}
+
+body#page-question-type-coderunner div[id^=fgroup_id_testcasecontrols] {
+  /* Round the bottom of last part of testcase */
+  border-radius: 0px 0px 0.5rem 0.5rem;
+  padding-bottom: 8px !important;
+}
+
+
 /* stylelint-disable declaration-no-important  */
 
 body#page-question-type-coderunner div[id^=fitem_id_testcode]:first-of-type {
