@@ -34,8 +34,8 @@ use qtype_coderunner\constants;
  * CodeRunner editing form definition.
  */
 class qtype_coderunner_edit_form extends question_edit_form {
-    const NUM_TESTCASES_START = 5;  // Num empty test cases with new questions.
-    const NUM_TESTCASES_ADD = 3;    // Extra empty test cases to add.
+    const NUM_TESTCASES_START = 1;  // Num empty test cases with new questions.
+    const NUM_TESTCASES_ADD = 1;    // Extra empty test cases to add. // WARN: this does nothing?
     const DEFAULT_NUM_ROWS = 18;    // Answer box rows.
     const DEFAULT_NUM_COLS = 100;   // Answer box columns.
     const TEMPLATE_PARAM_ROWS = 5;  // The number of rows of the template parameter field.
@@ -329,8 +329,8 @@ class qtype_coderunner_edit_form extends question_edit_form {
      * @param $label the label to use for each option.
      * @param $gradeoptions the possible grades for each answer.
      * @param $minoptions the minimum number of testcase blanks to display.
-     *      Default QUESTION_NUMANS_START.
-     * @param $addoptions the number of testcase blanks to add. Default QUESTION_NUMANS_ADD.
+     *      Default NUM_TESTCASES_ADD.
+     * @param $addoptions the number of testcase blanks to add. Default NUM_TESTCASES_ADD.
      */
     protected function add_per_testcase_fields($mform, $label, $numtestcases) {
         $mform->addElement(
@@ -348,11 +348,11 @@ class qtype_coderunner_edit_form extends question_edit_form {
             $repeatedoptions,
             'numtestcases',
             'addanswers',
-            QUESTION_NUMANS_ADD,
+            self::NUM_TESTCASES_ADD,
             $this->get_more_choices_string(),
             true
         );
-        $n = $numtestcases + QUESTION_NUMANS_ADD;
+        $n = $numtestcases + self::NUM_TESTCASES_ADD;
         for ($i = 0; $i < $n; $i++) {
             $mform->disabledIf("mark[$i]", 'allornothing', 'checked');
         }
