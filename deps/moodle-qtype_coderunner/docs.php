@@ -63,7 +63,19 @@ $PAGE->set_title('CodeRunner Documentation');
 // inject CSS as \@imports do not work on ./styles.css 
 $PAGE->requires->css(new moodle_url('/question/type/coderunner/docs/editor/styles/docs.css'));
 
+// This block of code fixes the lack of id tags attached to headers.
+global $CFG;
+require_once($CFG->libdir . '/markdown/MarkdownInterface.php');
+require_once($CFG->libdir . '/markdown/Markdown.php');
+require_once($CFG->libdir . '/markdown/MarkdownExtra.php');
+
+$md = new \Michelf\MarkdownExtra();
+$md->header_id_func = function($headervalue) {
+    $slug = strtolower(trim($headervalue));
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+    return trim($slug, '-');
+};
+
 echo $OUTPUT->header();
-// your content here
-echo markdown_to_html(file_get_contents($file));
+echo $md->transform(file_get_contents($file));
 echo $OUTPUT->footer();

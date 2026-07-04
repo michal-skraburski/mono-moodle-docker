@@ -17,10 +17,10 @@ The editor is organised into panels that roughly follow the lifecycle of a submi
 6. **Attachment Options** — allow students to upload files alongside their code.
 7. **Advanced Customisation** — turn this question into a reusable prototype, or fine-tune sandbox resource limits.
 
-For a deep-dive into how templates work, Twig variables, and template graders, see [Templating](docs.php?page=templating).
+For a deep-dive into how templates work, Twig variables, and template graders, see [Templating](docs.php?page=templating.md).
 
 ## Table of Contents
-1. [Question Type](#question-type)
+1. [Question Type](docs.php?page=index.md#question-type)
    1. [Question type selector](#question-type-selector)
    2. [Customise & Show source](#customise--show-source)
    3. [Answer box lines](#answer-box-lines)
@@ -173,7 +173,7 @@ The **Preprocessor** dropdown controls how this field is evaluated before the te
 
 > **Performance warning**: non-Twig preprocessors with *Evaluate per try* checked run a sandbox job for every student when they open the question. In large exams this can overload the Jobe server. Prefer Twig for randomisation.
 
-For randomisation examples and the full preprocessor reference see [Templating — Template parameters](docs.php?page=templating#template-parameters).
+For randomisation examples and the full preprocessor reference see [Templating — Template parameters](docs.php?page=templating.md#template-parameters).
 
 ---
 
@@ -224,9 +224,9 @@ int main() {
 }
 ```
 
-The full set of Twig variables available in the template (`TEST`, `STUDENT_ANSWER`, `QUESTION`, `STUDENT`, `QUIZ`, `IS_PRECHECK`) is documented in [Templating — Twig context variables](docs.php?page=templating#twig-context-variables).
+The full set of Twig variables available in the template (`TEST`, `STUDENT_ANSWER`, `QUESTION`, `STUDENT`, `QUIZ`, `IS_PRECHECK`) is documented in [Templating — Twig context variables](docs.php?page=templating.md#twig-context-variables).
 
-When inserting `STUDENT_ANSWER` as a string literal rather than raw code, use an escaper to prevent embedded quotes from breaking the syntax — e.g. `{{ STUDENT_ANSWER | e('py') }}` for Python. See [Templating — Twig escapers](docs.php?page=templating#twig-escapers).
+When inserting `STUDENT_ANSWER` as a string literal rather than raw code, use an escaper to prevent embedded quotes from breaking the syntax — e.g. `{{ STUDENT_ANSWER | e('py') }}` for Python. See [Templating — Twig escapers](docs.php?page=templating.md#twig-escapers).
 
 ---
 
@@ -284,7 +284,7 @@ student = """{{ STUDENT_ANSWER | e('py') }}"""
 print(json.dumps({"fraction": 0.5, "got": "Half the tests passed."}))
 ```
 
-For a **combinator** TemplateGrader the JSON controls the entire feedback panel (`fraction`, `prologuehtml`, `testresults`, etc.). See [Templating — Template graders](docs.php?page=templating#template-graders) for the full field reference.
+For a **combinator** TemplateGrader the JSON controls the entire feedback panel (`fraction`, `prologuehtml`, `testresults`, etc.). See [Templating — Template graders](docs.php?page=templating.md#template-graders) for the full field reference.
 
 The `TEST.extra` field (set per test case in the [Extra field](#extra)) is how you pass grader-specific data — expected return values, tolerances, and so on — into a TemplateGrader template.
 
@@ -491,4 +491,4 @@ Multilanguage questions require a template that reads `{{ ANSWER_LANGUAGE }}` to
 
 ## See also
 
-- [Templating](docs.php?page=templating) — Twig variables, per-test and combinator templates, template parameters, randomisation, and template graders.
+- [Templating](docs.php?page=templating.md) — Twig variables, per-test and combinator templates, template parameters, randomisation, and template graders.
