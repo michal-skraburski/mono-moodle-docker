@@ -44,6 +44,53 @@
   background-color: #f9f9f9;
 }
 
+/* inline code */
+#page-question-type-coderunner-docs code {
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+  font-size: 0.875em;
+  background-color: #f0f0f0;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+/* block code */
+#page-question-type-coderunner-docs pre {
+  background-color: #1e1e2e;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid #313244;
+  line-height: 1.5;
+}
+
+#page-question-type-coderunner-docs pre code {
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+  font-size: 0.875rem;
+  background: none;
+  color: #cdd6f4;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  white-space: pre;
+}
+
+/* blockquote (warning/note callouts) */
+#page-question-type-coderunner-docs blockquote {
+  border-left: 4px solid #f9e2af;
+  background-color: #fdf6e3;
+  color: #5c4a00;
+  margin: 1rem 0;
+  padding: 0.6rem 1rem;
+  border-radius: 0 4px 4px 0;
+}
+
+#page-question-type-coderunner-docs blockquote p {
+  margin: 0;
+}
+
 @media (max-width: 768px) {
 
   #page-question-type-coderunner-docs #page {
