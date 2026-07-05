@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -e
+
+# Runs grunt for the qtype_coderunner plugin, using a throwaway node container
+# so the plugin (mounted from $CODERUNNER_REPO, normally outside $MOODLE_DOCKER_WWWROOT)
+# is seen by Moodle's Gruntfile as living at question/type/coderunner, exactly as
+# the webserver container sees it. This avoids needing node/npm installed on the
+# host or inside the webserver container.
+#
+# Usage: bin/moodle-docker-grunt-coderunner [grunt task, default: amd]
+
+thisfile=$( readlink "${BASH_SOURCE[0]}" ) || thisfile="${BASH_SOURCE[0]}"
+basedir="$( cd "$( dirname "$thisfile" )/../" && pwd -P )"
+
+if [ -z "$MOODLE_DOCKER_WWWROOT" ] || [ ! -d "$MOODLE_DOCKER_WWWROOT" ];
+then
+    echo 'Error: $MOODLE_DOCKER_WWWROOT is not set or not an existing directory'
+    exit 1
+fi
+
+if [ -z "$CODERUNNER_REPO" ] || [ ! -d "$CODERUNNER_REPO" ];
+then
+    echo 'Error: $CODERUNNER_REPO is not set or not an existing directory'
+    exit 1
+fi
+
+wwwroot="$(cd "$MOODLE_DOCKER_WWWROOT" && pwd -P)"
+coderunner="$(cd "$CODERUNNER_REPO" && pwd -P)"
+nodeimage="node:22"
+
+dockerrun="docker run --rm --user $(id -u):$(id -g)"
+mounts="-v ${wwwroot}:/var/www/html -v ${coderunner}:/var/www/html/question/type/coderunner"
+
+if [ ! -d "${wwwroot}/node_modules" ];
+then
+    echo "Installing Moodle grunt dependencies into ${wwwroot}/node_modules (one-time)..."
+    $dockerrun -v "${wwwroot}:/var/www/html" -w /var/www/html "$nodeimage" \
+        npm install --no-audit --no-fund
+fi
+
+task="${1:-amd}"
+shift || true
+
+$dockerrun $mounts -w /var/www/html/question/type/coderunner "$nodeimage" \
+    npx grunt "$task" "$@"
