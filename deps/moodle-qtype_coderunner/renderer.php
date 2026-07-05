@@ -55,7 +55,10 @@ class qtype_coderunner_renderer extends qtype_renderer {
         }
         $divid = "qtype_coderunner_problemspec$qid";
         $params = $question->parameters;
-        $qtext = '';
+        $queid = $qa->get_outer_question_div_unique_id();
+        $this->page->requires->js_call_amd('qtype_coderunner/layoutswitcher', 'layoutSwitcher', [$queid]);
+
+        $qtext = html_writer::start_tag('div', ['class' => 'question_box']);
         if (isset($question->initialisationerrormessage) && $question->initialisationerrormessage) {
             $qtext .= "<div class='initialisationerror'>{$question->initialisationerrormessage}</div>";
         }
@@ -80,8 +83,10 @@ class qtype_coderunner_renderer extends qtype_renderer {
             $qtext .= html_writer::end_tag('div');
         }
 
+        $qtext .= html_writer::end_tag('div'); // question-box
+        $qtext .= html_writer::start_tag('div', ['class' => 'answer-box']);
         $qtext .= html_writer::start_tag('div', ['class' => 'prompt']);
-
+        
         $responsefieldname = $qa->get_qt_field_name('answer');
         $responsefieldid = 'id_' . $responsefieldname;
         $answerprompt = html_writer::tag(
@@ -112,7 +117,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
             }
         }
 
-        $qtext .= html_writer::end_tag('div');
+        $qtext .= html_writer::end_tag('div'); // answerprompt
 
         $preload = isset($question->answerpreload) ? $question->answerpreload : '';
         if ($preload) {  // Add a reset button if preloaded text is non-empty.
@@ -187,7 +192,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
                 [$responsefieldid]
             );
         }
-
+        $qtext .= html_writer::end_tag('div'); // answer_box;
         return $qtext;
     }
 

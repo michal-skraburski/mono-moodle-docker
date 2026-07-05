@@ -20,7 +20,7 @@ The editor is organised into panels that roughly follow the lifecycle of a submi
 For a deep-dive into how templates work, Twig variables, and template graders, see [Templating](docs.php?page=templating.md).
 
 ## Table of Contents
-1. [Question Type](docs.php?page=index.md#question-type)
+1. [Question Type](#question-type)
    1. [Question type selector](#question-type-selector)
    2. [Customise & Show source](#customise--show-source)
    3. [Answer box lines](#answer-box-lines)
