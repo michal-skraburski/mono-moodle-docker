@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\output\html_writer;
 use qtype_coderunner\constants;
 
 /**
@@ -84,6 +85,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
         }
 
         $qtext .= html_writer::end_tag('div'); // question-box
+        $qtext .= html_writer::tag('div', html_writer::tag('p', '&nbsp;'), ['class' => 'divider']); 
         $qtext .= html_writer::start_tag('div', ['class' => 'answer-box']);
         $qtext .= html_writer::start_tag('div', ['class' => 'prompt']);
         

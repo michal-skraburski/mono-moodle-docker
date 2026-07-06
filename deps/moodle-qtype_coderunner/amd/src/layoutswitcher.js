@@ -28,9 +28,44 @@ define([], function () {
     }
 
     const formulation = que.querySelector('.formulation');
-    if (!formulation) {
+
+    const questionBox = que.querySelector('.formulation .question_box');
+    const answerBox = que.querySelector('.formulation .answer-box'); // TODO: fix this inconsistency
+
+    const divider = que.querySelector('.formulation .divider');
+    if (!divider || !answerBox || !questionBox || !formulation) {
       return;
     }
+
+    let dragStartX = 0;
+    let questionStartWidth = 0;
+    let answerStartWidth = 0;
+
+    const onDividerDrag = event => {
+      const delta = event.clientX - dragStartX;
+      const newQuestionWidth = questionStartWidth + delta;
+      const newAnswerWidth = answerStartWidth - delta;
+      const totalWidth = newQuestionWidth + newAnswerWidth;
+      const questionRatio = newQuestionWidth / totalWidth;
+      const answerRatio = newAnswerWidth / totalWidth;
+      questionBox.style.flex = `${questionRatio} ${questionRatio} 0`;
+      answerBox.style.flex = `${answerRatio} ${answerRatio} 0`;
+    };
+
+    const onDividerDragEnd = () => {
+      document.removeEventListener('mousemove', onDividerDrag);
+      document.removeEventListener('mouseup', onDividerDragEnd);
+    };
+
+    divider.addEventListener('mousedown', event => {
+      event.preventDefault();
+      dragStartX = event.clientX;
+      questionStartWidth = questionBox.getBoundingClientRect().width;
+      answerStartWidth = answerBox.getBoundingClientRect().width;
+      document.addEventListener('mousemove', onDividerDrag);
+      document.addEventListener('mouseup', onDividerDragEnd);
+    });
+
 
     const controls = document.createElement('div');
     controls.className = 'coderunner-layout-controls';
@@ -56,6 +91,10 @@ define([], function () {
      * @param {string} mode Either 'split' or 'stacked'.
      */
     function applyLayout(mode) {
+      // A prior drag may have pinned these to inline pixel widths, which would
+      // otherwise permanently override the stylesheet's flex rules below.
+      questionBox.style.flex = '';
+      answerBox.style.flex = '';
       if (mode === 'stacked') {
         que.classList.add('layout-stacked');
         stackBtn.classList.add('active');
