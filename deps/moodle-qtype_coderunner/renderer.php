@@ -59,7 +59,8 @@ class qtype_coderunner_renderer extends qtype_renderer {
         $queid = $qa->get_outer_question_div_unique_id();
         $this->page->requires->js_call_amd('qtype_coderunner/layoutswitcher', 'layoutSwitcher', [$queid]);
 
-        $qtext = html_writer::start_tag('div', ['class' => 'question_box']);
+        $qtext = $this->layout_prepaint_script($queid);
+        $qtext .= html_writer::start_tag('div', ['class' => 'question_box']);
         if (isset($question->initialisationerrormessage) && $question->initialisationerrormessage) {
             $qtext .= "<div class='initialisationerror'>{$question->initialisationerrormessage}</div>";
         }
@@ -198,6 +199,34 @@ class qtype_coderunner_renderer extends qtype_renderer {
         return $qtext;
     }
 
+
+    /**
+     * This block of code injects JS before the page fully loads which allows the
+     * layout to be set prior to being rendered, making the layout switch automatic
+     * and seamless.
+     *
+     * @param string $queid the id of the outer .que.coderunner div for this question.
+     * @return string HTML fragment containing the inline script.
+     */
+    protected function layout_prepaint_script($queid) {
+        $queidjs = json_encode($queid);
+        $js = <<<JS
+(function() {
+    try {
+        var obj = JSON.parse(sessionStorage.getItem('coderunner_layout') || '{}');
+        if (obj[$queidjs] === 'split') {
+            var que = document.getElementById($queidjs);
+            if (que) {
+                que.classList.add('layout-split');
+            }
+        }
+    } catch (e) {
+        // sessionStorage may be unavailable; fall back to the default stacked layout.
+    }
+})();
+JS;
+        return html_writer::script($js);
+    }
 
     /**
      * Override the base class method to allow CodeRunner questions to force
