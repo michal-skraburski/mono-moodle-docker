@@ -86,6 +86,10 @@ class qbehaviour_adaptive_adapted_for_coderunner extends qbehaviour_adaptive {
         if (!$this->qa->get_state()->is_finished() && !empty($this->question->precheck)) {
             $vars['precheck'] = PARAM_BOOL;
         }
+        // Allow for saving as a draft only when not finished
+        if (!$this->qa->get_state()->is_finished()) {
+            $vars['savedraft'] = PARAM_BOOL;
+        }
         if ($this->is_give_up_avaiable_now()) {
             $vars['finish'] = PARAM_BOOL;
         }

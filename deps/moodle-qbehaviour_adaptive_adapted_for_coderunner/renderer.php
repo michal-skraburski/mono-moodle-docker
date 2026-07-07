@@ -48,7 +48,30 @@ class qbehaviour_adaptive_adapted_for_coderunner_renderer extends qbehaviour_ada
             $buttons .= html_writer::div('', 'flex-grow-1');
             $buttons .= $this->give_up_button($qa, $options);
         }
+        $buttons .= $this->savedraft_button($qa, $options);
         return html_writer::div($buttons, 'd-flex');
+    }
+
+    /**
+     * Construct the HTML for the optional 'Save draft' button, which only 
+     * saves the current state of the textarea. It is an affordance.
+     * This code is identical to the 'submit_button' code in
+     * qbehaviour_renderer::submit_button except for the id and name of the
+     * button.
+     */
+    protected function savedraft_button(question_attempt $qa, question_display_options $options) {
+        $attributes = array(
+            'type' => 'submit',
+            'id' => $qa->get_behaviour_field_name('savedraft'),
+            'name' => $qa->get_behaviour_field_name('savedraft'),
+            'value' => get_string('savedraft', 'qbehaviour_adaptive_adapted_for_coderunner'),
+            'class' => 'submit btn btn-outline-secondary',
+        );
+        $output = html_writer::empty_tag('input', $attributes);
+        if (!$options->readonly) {
+            $this->page->requires->js_call_amd('core_question/question_engine', 'initSubmitButton', [$attributes['id']]);
+        }
+        return $output;
     }
 
     /**

@@ -27,6 +27,7 @@ $string['giveup'] = 'Stop and read final feedback';
 $string['notcomplete'] = 'Not complete';
 $string['pluginname'] = 'Adaptive adapted for coderunner';
 $string['precheck'] = 'Precheck';
+$string['savedraft'] = 'Save draft';
 $string['precheckedresponse'] = 'Prechecked: {$a}';
 $string['precheckresults'] = 'Precheck results';
 $string['privacy:metadata'] = 'The qbehaviour_adaptive_adapted_for_coderunner question behaviour plugin does not store any personal data.';
