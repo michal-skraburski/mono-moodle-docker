@@ -544,6 +544,10 @@ body#page-question-type-coderunner div[id^=fgroup_id_testcasecontrols] {
   padding-bottom: 8px !important;
 }
 
+body#page-question-type-coderunner div[id^=fgroup_id_coderunner_precheck_group] > .felement {
+
+}
+
 .que.coderunner .divider {
   cursor: col-resize;
   user-select: none;
@@ -551,14 +555,15 @@ body#page-question-type-coderunner div[id^=fgroup_id_testcasecontrols] {
   -webkit-user-select: none;
   align-self: stretch;
 }
+
 .que.coderunner .formulation {
-  /* Change current layout to horzontial */
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
     align-items: flex-start;
 }
 
+  /* Defaults for vertical layout */
 .que.coderunner .question_box {
     flex: 1 1 0;
     min-width: 0;
@@ -612,6 +617,7 @@ body#page-question-type-coderunner div[id^=fgroup_id_testcasecontrols] {
         flex: 0 0 100%;
     }
 }
+/* end of Michal S changes */ 
 
 /* stylelint-disable declaration-no-important  */
 

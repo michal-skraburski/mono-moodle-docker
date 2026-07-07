@@ -42,6 +42,8 @@ define([], function () {
     let answerStartWidth = 0;
 
     const onDividerDrag = event => {
+      // The complexity from this comes from needing to be able to dynamically
+      // resize based on window size changing as well as the divider moving.
       const delta = event.clientX - dragStartX;
       const newQuestionWidth = questionStartWidth + delta;
       const newAnswerWidth = answerStartWidth - delta;
@@ -72,12 +74,14 @@ define([], function () {
 
     const splitBtn = document.createElement('button');
     splitBtn.className = 'coderunner-layout-btn';
+    splitBtn.ariaLabel = 'Press this button to switch to a Side by Side view';
     splitBtn.type = 'button';
     splitBtn.title = 'Side by side';
     splitBtn.innerHTML = '&#x2b1c;&#x2b1c;';  // ⬜⬜
 
     const stackBtn = document.createElement('button');
     stackBtn.className = 'coderunner-layout-btn';
+    stackBtn.ariaLabel = 'Press this button to switch to a vertically stacked view';
     stackBtn.type = 'button';
     stackBtn.title = 'Stacked';
     stackBtn.innerHTML = '&#x2b1c;';  // ⬜

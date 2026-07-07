@@ -250,6 +250,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
         }
 
         $q = $qa->get_question();
+        $queid = $qa->get_outer_question_div_unique_id();
         $outcome = @unserialize($toserialised);
         if ($outcome === false) {
             $outcome = new qtype_coderunner_testing_outcome(0, 0, false);
@@ -272,8 +273,9 @@ class qtype_coderunner_renderer extends qtype_renderer {
         if ($q->showsource) {
             $fb .= $this->make_source_code_div($outcome);
         }
-
-        $fb .= html_writer::start_tag('div', ['class' => $resultsclass]);
+        // aria-live has no effect, but it's here until I do figure something out
+        $fb .= html_writer::start_tag('div', ['class' => $resultsclass, 'aria-live' => 'polite']);
+    
         if ($outcome->invalid()) {
             $fb .= html_writer::tag(
                 'h5',
@@ -497,7 +499,7 @@ class qtype_coderunner_renderer extends qtype_renderer {
             }
         }
 
-        return qtype_coderunner_util::make_html_para($lines);
+        return qtype_coderunner_util::make_html_para_with('results_message', $lines);
     }
 
 
