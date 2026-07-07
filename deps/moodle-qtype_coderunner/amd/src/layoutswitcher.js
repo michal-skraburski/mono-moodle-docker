@@ -77,7 +77,7 @@ define([], function () {
     splitBtn.ariaLabel = 'Press this button to switch to a Side by Side view';
     splitBtn.type = 'button';
     splitBtn.title = 'Side by side';
-    splitBtn.innerHTML = '&#x2b1c;&#x2b1c;';  // ⬜⬜
+    splitBtn.innerHTML = '&#x2b1c;&nbsp;&#x2b1c;';  // ⬜⬜
 
     const stackBtn = document.createElement('button');
     stackBtn.className = 'coderunner-layout-btn';
@@ -86,8 +86,8 @@ define([], function () {
     stackBtn.title = 'Stacked';
     stackBtn.innerHTML = '&#x2b1c;';  // ⬜
 
-    controls.appendChild(splitBtn);
     controls.appendChild(stackBtn);
+    controls.appendChild(splitBtn);
     formulation.prepend(controls);
 
     /**
@@ -108,19 +108,62 @@ define([], function () {
         splitBtn.classList.add('active');
         stackBtn.classList.remove('active');
       }
-      try {
-        localStorage.setItem(STORAGE_KEY, mode);
-      } catch (e) { /* storage may be unavailable */ }
+      save(questionId, mode);
     }
 
     splitBtn.addEventListener('click', () => applyLayout('split'));
     stackBtn.addEventListener('click', () => applyLayout('stacked'));
 
-    const saved = (() => {
-      try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
-    })();
-    applyLayout(saved === 'stacked' ? 'stacked' : 'split');
+    applyLayout(unpack(questionId));
+  }
+  /**
+   *
+   * @returns {object} The localStorage object using the STORAGE_KEY
+   */
+  function getObj() {
+    // type QuestionLayout = string;
+    // type QuestionID = string;
+    // type QuestionLayoutTracker = Hashmap(QuestionID, QuestionLayout);
+    try {
+      // For unknown reasons, whether due to my debug state, localStorage gets wiped on load
+      // NOTE: if implementing localStorage, be aware of storage lifetime
+      let text = sessionStorage.getItem(STORAGE_KEY);
+      if (text === null) {
+        return {};
+      }
+      return JSON.parse(text);
+    } catch (e) { return null; }
+  }
+  /**
+   *
+   * @param {*} questionId The questionId used to get the last remembered layout
+   * @returns {string} The layout of the question last remembered. Defaults to 'stacked'
+   */
+  function unpack(questionId) {
+
+    let obj = getObj();
+    let saved = obj[questionId] === 'split' ? 'split' : 'stacked';
+    return saved;
+  }
+  /**
+   *
+   * @param {string} questionId The question to save the layout of
+   * @param {string} layout The layout to remember
+   * @returns {void}
+   */
+  function save(questionId, layout) {
+    let obj = getObj();
+
+    obj[questionId] = layout;
+
+    let text = JSON.stringify(obj);
+    // For unknown reasons, whether due to my debug state, localStorage gets wiped on load
+    try { sessionStorage.setItem(STORAGE_KEY, text); } catch (e) {
+      // localStorage may be unavailable.
+      return null;
+    }
   }
 
   return { layoutSwitcher };
 });
+
