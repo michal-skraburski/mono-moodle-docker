@@ -99,14 +99,16 @@ define([], function () {
       // otherwise permanently override the stylesheet's flex rules below.
       questionBox.style.flex = '';
       answerBox.style.flex = '';
-      if (mode === 'stacked') {
-        que.classList.add('layout-stacked');
-        stackBtn.classList.add('active');
-        splitBtn.classList.remove('active');
-      } else {
-        que.classList.remove('layout-stacked');
+      if (mode === 'split') {
+        que.classList.add('layout-split');
         splitBtn.classList.add('active');
         stackBtn.classList.remove('active');
+
+      } else {
+        que.classList.remove('layout-split');
+        stackBtn.classList.add('active');
+        splitBtn.classList.remove('active');
+
       }
       save(questionId, mode);
     }
