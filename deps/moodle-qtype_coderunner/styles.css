@@ -537,15 +537,24 @@ body#page-question-type-coderunner div[id^=fitem_id_testcode] {
   /* Round the top of first part of testcase */
   border-radius: 0.5rem 0.5rem 0px 0px;
 }
-
+body#page-question-type-coderunner div[id^=fitem_id_testtype_] {
+  /* This refers to the precheck group, I swapped this to below extra */
+  margin-bottom: 0 !important;
+}
 body#page-question-type-coderunner div[id^=fgroup_id_testcasecontrols] {
+  /* Make space for delete testcase */
+  margin-bottom: 0 !important;
+}
+
+body#page-question-type-coderunner div[id^=fitem_id_deletetestcase_] {
   /* Round the bottom of last part of testcase */
   border-radius: 0px 0px 0.5rem 0.5rem;
   padding-bottom: 8px !important;
 }
 
-body#page-question-type-coderunner div[id^=fgroup_id_coderunner_precheck_group] > .felement {
-
+body#page-question-type-coderunner input.testcasedelete {
+  float: right;
+  margin: 0 18px 12px 0;
 }
 
 .que.coderunner .divider {
@@ -669,7 +678,7 @@ body#page-question-type-coderunner div[id^=fitem_id_testcode]:first-of-type {
     border-top: 1px solid #ccc !important;
 }
 
-body#page-question-type-coderunner div[id^=fgroup_id_testcasecontrols_] {
+body#page-question-type-coderunner div[id^=fitem_id_deletetestcase_] {
     border-bottom: 1px solid #ccc !important;
 }
 
