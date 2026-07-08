@@ -17,6 +17,14 @@ define([], function () {
 
   const STORAGE_KEY = 'coderunner_layout';
 
+  // Tracks, across every CodeRunner question on the page, which ones currently
+  // have their info panel collapsed. #topofscroll expands (reclaims margin
+  // space) the instant the first panel is collapsed, and only reverts back
+  // once every question's panel has been reopened (this set is empty again)
+  // - so the page doesn't shrink back while some other question on the page
+  // is still relying on the extra width.
+  const collapsedInfoQuestions = new Set();
+
   /**
    * Inject the layout toggle controls and wire up handlers.
    * @param {string} questionId The id attribute of the .que.coderunner element.
@@ -35,6 +43,34 @@ define([], function () {
     const divider = que.querySelector('.formulation .divider');
     if (!divider || !answerBox || !questionBox || !formulation) {
       return;
+    }
+
+    const infoDiv = que.querySelector('.info');
+    if (infoDiv) {
+      const infoToggleBtn = document.createElement('button');
+      infoToggleBtn.className = 'info-toggle-btn';
+      infoToggleBtn.type = 'button';
+      infoDiv.prepend(infoToggleBtn);
+
+      const applyInfoCollapse = collapsed => {
+        que.classList.toggle('info-collapsed', collapsed);
+        if (collapsed) {
+          collapsedInfoQuestions.add(questionId);
+        } else {
+          collapsedInfoQuestions.delete(questionId);
+        }
+        applyPageExpand(collapsedInfoQuestions.size > 0);
+        infoToggleBtn.innerHTML = collapsed ? '&#8250;' : '&#8249;';
+        infoToggleBtn.title = collapsed ? 'Show question info' : 'Hide question info';
+        infoToggleBtn.ariaLabel = infoToggleBtn.title;
+        saveQuestionState(questionId, { infoCollapsed: collapsed });
+      };
+
+      infoToggleBtn.addEventListener('click', () => {
+        applyInfoCollapse(!que.classList.contains('info-collapsed'));
+      });
+
+      applyInfoCollapse(getQuestionState(questionId).infoCollapsed);
     }
 
     let dragStartX = 0;
@@ -110,25 +146,41 @@ define([], function () {
         splitBtn.classList.remove('active');
 
       }
-      save(questionId, mode);
+      saveQuestionState(questionId, { layout: mode });
     }
 
     splitBtn.addEventListener('click', () => applyLayout('split'));
     stackBtn.addEventListener('click', () => applyLayout('stacked'));
 
-    applyLayout(unpack(questionId));
+    applyLayout(getQuestionState(questionId).layout);
   }
+
+  /**
+   * Boost (and derivatives) wrap the page content in a #topofscroll element
+   * whose side margins reserve space for the nav/block drawers. Collapsing
+   * the info panel frees up horizontal room, so mirror that state onto
+   * #topofscroll too, if present. This is a theme-specific enhancement, not
+   * a requirement: on any theme that doesn't use this markup, this is a
+   * silent no-op and the info panel still collapses normally.
+   * @param {boolean} collapsed
+   */
+  function applyPageExpand(collapsed) {
+    const topofscroll = document.querySelector('#topofscroll');
+    if (!topofscroll) {
+      return;
+    }
+    topofscroll.classList.toggle('topofscroll-collapsed', collapsed);
+  }
+
   /**
    *
-   * @returns {object} The localStorage object using the STORAGE_KEY
+   * @returns {object} The sessionStorage object using the STORAGE_KEY
    */
   function getObj() {
-    // type QuestionLayout = string;
+    // type QuestionState = {layout: string, infoCollapsed: boolean};
     // type QuestionID = string;
-    // type QuestionLayoutTracker = Hashmap(QuestionID, QuestionLayout);
+    // type QuestionStateTracker = Hashmap(QuestionID, QuestionState);
     try {
-      // For unknown reasons, whether due to my debug state, localStorage gets wiped on load
-      // NOTE: if implementing localStorage, be aware of storage lifetime
       let text = sessionStorage.getItem(STORAGE_KEY);
       if (text === null) {
         return {};
@@ -138,30 +190,35 @@ define([], function () {
   }
   /**
    *
-   * @param {*} questionId The questionId used to get the last remembered layout
-   * @returns {string} The layout of the question last remembered. Defaults to 'stacked'
+   * @param {*} questionId The questionId used to get the last remembered state
+   * @returns {object} The state of the question last remembered, defaulted for anything missing.
    */
-  function unpack(questionId) {
-
-    let obj = getObj();
-    let saved = obj[questionId] === 'split' ? 'split' : 'stacked';
-    return saved;
+  function getQuestionState(questionId) {
+    let obj = getObj() || {};
+    let entry = obj[questionId];
+    if (typeof entry === 'string') {
+      // Legacy format: the whole entry used to just be the layout string.
+      entry = { layout: entry };
+    }
+    entry = entry || {};
+    return {
+      layout: entry.layout === 'split' ? 'split' : 'stacked',
+      infoCollapsed: !!entry.infoCollapsed,
+    };
   }
   /**
    *
-   * @param {string} questionId The question to save the layout of
-   * @param {string} layout The layout to remember
+   * @param {string} questionId The question to save state for
+   * @param {object} patch Partial state to merge into what's already remembered
    * @returns {void}
    */
-  function save(questionId, layout) {
-    let obj = getObj();
-
-    obj[questionId] = layout;
+  function saveQuestionState(questionId, patch) {
+    let obj = getObj() || {};
+    obj[questionId] = Object.assign({}, getQuestionState(questionId), patch);
 
     let text = JSON.stringify(obj);
-    // For unknown reasons, whether due to my debug state, localStorage gets wiped on load
     try { sessionStorage.setItem(STORAGE_KEY, text); } catch (e) {
-      // localStorage may be unavailable.
+      // sessionStorage may be unavailable.
       return null;
     }
   }

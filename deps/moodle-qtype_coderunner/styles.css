@@ -611,6 +611,47 @@ body#page-question-type-coderunner div[id^=fgroup_id_coderunner_precheck_group] 
     flex: 1 1 0;
 }
 
+.que.coderunner .info-toggle-btn {
+    display: block;
+    width: 1.4em;
+    height: 1.4em;
+    line-height: 1;
+    padding: 0;
+    margin-bottom: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85em;
+    opacity: 0.6;
+}
+
+.que.coderunner .info-toggle-btn:hover {
+    opacity: 1;
+}
+
+.que.coderunner.info-collapsed .info {
+    width: 1.4em;
+    height: 1.4em;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+}
+.que.coderunner.info-collapsed .info > *:not(.info-toggle-btn) {
+    display: none;
+}
+.que.coderunner.info-collapsed .info-toggle-btn {
+    margin: 0;
+}
+.que.coderunner.info-collapsed .content {
+    margin-left: 1.4em;
+}
+#topofscroll.topofscroll-collapsed {
+  max-width:1200px !important;
+}
+
 @media (max-width: 768px) {
     .que.coderunner .question_box,
     .que.coderunner .answer-box {

@@ -214,14 +214,27 @@ class qtype_coderunner_renderer extends qtype_renderer {
 (function() {
     try {
         var obj = JSON.parse(sessionStorage.getItem('coderunner_layout') || '{}');
-        if (obj[$queidjs] === 'split') {
+        var entry = obj[$queidjs];
+        if (typeof entry === 'string') {
+            entry = {layout: entry};
+        }
+        if (entry) {
             var que = document.getElementById($queidjs);
             if (que) {
-                que.classList.add('layout-split');
+                if (entry.layout === 'split') {
+                    que.classList.add('layout-split');
+                }
+                if (entry.infoCollapsed) {
+                    que.classList.add('info-collapsed');
+                    var topofscroll = document.getElementById('topofscroll');
+                    if (topofscroll) {
+                        topofscroll.classList.add('topofscroll-collapsed');
+                    }
+                }
             }
         }
     } catch (e) {
-        // sessionStorage may be unavailable; fall back to the default stacked layout.
+        // sessionStorage may be unavailable; fall back to the defaults.
     }
 })();
 JS;
