@@ -17,6 +17,10 @@ define([], function () {
 
   const STORAGE_KEY = 'coderunner_layout';
 
+  // Neither side of the split layout can be dragged narrower than this, in
+  // pixels, so the divider can't collapse a box to nothing (or invert it).
+  const MIN_BOX_WIDTH = 150;
+
   // Tracks, across every CodeRunner question on the page, which ones currently
   // have their info panel collapsed. #topofscroll expands (reclaims margin
   // space) the instant the first panel is collapsed, and only reverts back
@@ -81,9 +85,11 @@ define([], function () {
       // The complexity from this comes from needing to be able to dynamically
       // resize based on window size changing as well as the divider moving.
       const delta = event.clientX - dragStartX;
-      const newQuestionWidth = questionStartWidth + delta;
-      const newAnswerWidth = answerStartWidth - delta;
-      const totalWidth = newQuestionWidth + newAnswerWidth;
+      const totalWidth = questionStartWidth + answerStartWidth;
+      const minWidth = Math.min(MIN_BOX_WIDTH, totalWidth / 2);
+      let newQuestionWidth = questionStartWidth + delta;
+      newQuestionWidth = Math.max(minWidth, Math.min(newQuestionWidth, totalWidth - minWidth));
+      const newAnswerWidth = totalWidth - newQuestionWidth;
       const questionRatio = newQuestionWidth / totalWidth;
       const answerRatio = newAnswerWidth / totalWidth;
       questionBox.style.flex = `${questionRatio} ${questionRatio} 0`;
