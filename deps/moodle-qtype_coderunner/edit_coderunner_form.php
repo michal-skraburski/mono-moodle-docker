@@ -34,8 +34,8 @@ use qtype_coderunner\constants;
  * CodeRunner editing form definition.
  */
 class qtype_coderunner_edit_form extends question_edit_form {
-    const NUM_TESTCASES_START = 1;  // Num empty test cases with new questions.
-    const NUM_TESTCASES_ADD = 1;    // Extra empty test cases to add. // WARN: this does nothing?
+    const NUM_TESTCASES_START = 3;  // Num empty test cases with new questions.
+    const NUM_TESTCASES_ADD = 3;    // Extra empty test cases to add. 
     const DEFAULT_NUM_ROWS = 18;    // Answer box rows.
     const DEFAULT_NUM_COLS = 100;   // Answer box columns.
     const TEMPLATE_PARAM_ROWS = 5;  // The number of rows of the template parameter field.
