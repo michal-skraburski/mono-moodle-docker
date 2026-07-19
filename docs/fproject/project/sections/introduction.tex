@@ -1,29 +1,19 @@
 \section{Introduction}
 
+Universities teach programming to cohorts far larger than any team of markers can assess by hand, and automated assessment has become the standard answer: students submit real code, the code is run against tests, and a grade is produced in seconds~\cite{reviewrecentsystems2010}. At the University of Strathclyde this happens inside Moodle, the online learning platform behind MyPlace, through a plugin called CodeRunner~\cite{CodeRunner2016}. CodeRunner adds a new kind of quiz question: one answered by writing a program, which is compiled, executed and graded automatically. It is mature, widely deployed and, in terms of raw capability, largely complete.
 
-This is a concise and clear overview of your dissertation(more or less 2-3 pages). You can start off the project description provided of the project that was allocated to you and flesh it out.
+Capability, however, is not the same as usability. The lecturers who author CodeRunner questions face a dense editing form offering a full suite of tools with little guidance on how to use them: test cases can be added only in fixed batches and never deleted, help text vanishes the moment it loses focus, controls sit misaligned, and the official manual is a single enormous page organised around the system's features rather than the author's task. The students answering questions have their own frictions: a fixed layout that forces scrolling between the question and the answer, screen space consumed by margins and panels, hidden tests that give zero details why they fail and no modern LSP support -- using the CodeRunner page for writing and testing code execution is doom for the students' grade. None of these faults stops anyone using the tool. Each one, multiplied across every question authored and every answer written by thousands of users, quietly taxes teaching and learning alike. Well-established design principles hold that this kind of friction is a software problem rather than a user problem~\cite{designofeveryday}, and tools embedded in education must keep evolving to meet its growing demands~\cite{pieterse2013automated}.
 
-Include (1) the problem you have tackled, (2) why this problem is worth addressing, (3) what you did to address it - in broad terms. Detail will come later.
+This project set out to remove that friction. The problem was approached as a user experience engineering task on a live, mature codebase: understand the system and its two audiences, identify the faults with evidence rather than intuition, turn the evidence into requirements, and deliver the improvements without breaking anything that already worked. Concretely, the project analysed CodeRunner through heuristic review, a survey of students and teachers, and interviews; built a fully reproducible Docker-based development environment in which the entire system can be recreated with one command; and delivered a set of improvements spanning both pages: proper test case management for authors, a corrected Precheck display, a switchable and resizable question layout, reclaimable screen space, an on-demand save for students, measurable accessibility gains, and task-focused documentation served from inside the plugin itself. The changes were verified with unit and browser-driven acceptance tests, and the delivered features were subsequently confirmed to be worth building by the survey, whose results are reported in Section~\ref{results}.
 
-
-
-i.e., issue(s) on which the research will focus, shall be clearly identified and described. You shall refer to past research work relevant to the topic and objectives, i.e, of the study. You shall outline where applicable the potential research output with respect to research transfer and uptake by the community.
-
-The introduction says: this is an overview of the project. This is why I did it (the problem) and how I tackled it. It is the \emph{runway} into the project. It lets the marker know what to expect of your report.
-
-If you're doing a research project, this would be the place to include the research questions you plan to address. For example:
+The project's objectives were:
 
 \begin{description}
-\item [RQ1:] Where did James Bond come from?
-
-\item [RQ2:] Why are pumpkins orange?
+\item [Objective 1:] Construct an isolated, repeatable development environment in which Moodle, CodeRunner and its dependencies can be built, run and regression-tested with minimal effort.
+\item [Objective 2:] Improve the ergonomics of the author page: flexible test case management, correct rendering, visual consistency and measurable accessibility.
+\item [Objective 3:] Improve the student answering experience: control over the question layout, reclaimable screen space and the ability to save work on demand.
+\item [Objective 4:] Provide effective, task-focused documentation reachable from within the tool.
+\item [Objective 5:] Evaluate the delivered changes with real students and teachers, and derive further requirements from their feedback.
 \end{description}
 
-If you're doing a project of type 1, include a list of objectives. For example:
-\begin{description}
-\item [Objective 1:] Provide software to allow James Bond to become invisible.
-
-\item [Objective 2:] Provide software to keep track of all loyalty points in one place.
-\end{description}
-
-Provide a `map' of your dissertation. For example: Section \ref{backg} reviews the background literature that was reviewed to inform this project. Then Section \ref{process}.....
+The remainder of this dissertation follows the project's own course. Section~\ref{backg} reviews the literature that informed it. Section~\ref{process} describes the methodology, the analysis of CodeRunner and its users, the requirements that emerged, and the designs that answered them. Section~\ref{product} details the implementation of each change and the verification and validation performed. Section~\ref{results} presents the survey results and their evaluation. The report closes with a discussion of the findings, an honest reflection on the process, and the conclusions drawn from the work.

@@ -2,26 +2,30 @@
 
 \subsection{Interpreting the Results}
 
-Here you will discuss your findings. This is especially relevant for research projects. You might 
- interpret what the data and evaluation implies, both for future research and for practice (if appropriate). 
- 
- The discussion is \textbf{not} a review of literature. You should try to compare research findings with previous work,
-provide  explanations for your findings,
-discuss  research findings, in terms of their contribution.
+The survey results support the project's central bet: that a mature assessment tool's remaining problems are experience problems, not capability problems. All three interface changes achieved majority approval in every respondent group, and the strongest demand recorded was not for something new but for more of the same, with half of all respondents asking for the layout switcher to be extended to other question types. The most divided reception, for the info-hide function, belongs to the change that alters how the page itself behaves rather than adding a visible control; this suggests that features which move existing content need more explanation, or gentler defaults, than features which add something clearly optional.
 
+The documentation findings carry a wider implication. The teachers surveyed did not criticise the quality of CodeRunner's manual, only its shape, and two of them reported working from forums and third-party examples rather than the documentation at all. This matches the analysis in Section~\ref{process} and suggests the real competition for official documentation is not better official documentation but informal knowledge scattered across colleagues and forums. Documentation that lives where the work happens, as built for NFR3, is an attempt to bring that knowledge back into the tool. The one governance concern raised, about who arbitrates contributions, is the correct next question and is addressed under future work.
 
 \subsection{Reflection}
 
-Look back and think about what you would do differently if you were going to start the project with the knowledge you have now. Be honest about your mistakes or missteps. 
+The clearest lesson is written in the project's own commit history: the test environment should have been completed before feature work began, not alongside it. The first behaviour-changing commit was made on 1 July and, among other things, reduced the number of blank test cases a new question opens with. The scripts that make the regression suites runnable only landed on 8 and 10 July, and the Selenium configuration that let the browser tests run reliably was fixed on 17 July. The first full run of the suite that day exposed that the 1 July change had been breaking upstream acceptance tests for over two weeks, and the fix was committed within hours of the harness working. Had DE3 been discharged first, a sixteen-day-old latent regression would instead have been a same-day correction. The requirement was identified early; its priority was misjudged.
+
+A second lesson concerns commit discipline. Several commits bundle unrelated changes, such as accessibility labels arriving in the same commit as the new documentation page, or the test case index rewrite sharing a commit with the delete button and a form reordering. This cost nothing at the time but made later work harder: writing this report, tracing when a regression entered, and understanding which change caused which effect all required untangling commits that should have been three commits each.
+
+Finally, the history records a misjudgement about what counts as work. The commit message for the Precheck rendering fix reads `this is probably the one legitimate fix I've made so far', written after hours of diagnosis produced a one-word change. With hindsight this undervalues exactly the work that mattered: the diagnosis was the fix, and the polish, styling and interface changes dismissed in that message were the substance of the project's requirements. Recognising analysis and refinement as legitimate engineering, rather than only new code, is a perspective this project taught.
 
 \subsection{Challenges}
-This is not the place to mention personal circumstances but rather challenges related to the work involved in the project.
+
+The environment consumed far more of the schedule than anticipated. Before any feature could be attempted, the project had to assemble four codebases into one repository, learn Docker from scratch, and diagnose two failures in sequence: macOS permissions silently breaking the shared plugin folders, which forced a switch to a Linux machine, and Moodle's security policy blocking the internal web requests its own components use, which cost many hours because the failure gave no useful signal. The lesson carried forward is that platform security policies should be the first suspect when two locally-run services refuse to talk.
+
+The second sustained challenge was working inside a large, unfamiliar, live codebase. CodeRunner and Moodle's question framework are mature systems with their own idioms, and several tasks that appeared small required understanding those idioms first: the delete button was one parameter, but making it safe required discovering that the form library re-applies help buttons by row index and rewriting every loop that assumed test case indices were contiguous. Estimating work by the size of the visible change proved consistently misleading.
 
 \subsection{Limitations}
-Acknowledge things like: small number of participants, software wasn't completely debugged, or whatever else went wrong and affected your project.
-\emph{Include as appropriate}
 
-
+The evaluation has clear limits. The survey settled on 24 participants, of whom only seven were teachers, and the documentation questions were shown to teachers alone, leaving five substantive responses after two test entries were excluded; conclusions drawn from that subset are indicative rather than firm. Participants judged the features from images and recordings rather than hands-on use, a constraint accepted for data protection reasons, so the results measure first impressions rather than lived usage. On the product side, the new interface behaviour has no automated tests of its own, two requirements (FR5 and FR9) were deferred, and the documentation page is not yet reachable from the question editing form, which leaves part of NFR3 outstanding at the time of writing.
+% TODO: remove or update the reachability clause above once the editing-form
+% link is implemented, together with the matching TODOs in product.tex.
 
 \subsection{Future Work}
-If someone else wanted to build on your project's product, what would be cool to do next?
+
+The survey and the analysis point in the same direction for what to build next. The highest-value item is hints for hidden test cases (the deferred FR5): it was requested in the survey, it addresses the student-side pain the analysis rated most serious, and the literature identifies feedback quality as the field's persistent weakness~\cite{keuningfeedback}. The copy button on code blocks (FR9) remains a small, high benefit-to-cost addition. The ACE editor could be easily made to support linters and LSPs with some modification which is an a very good contribution on its own. Beyond the deferred requirements, three items emerged during the project: extending the layout switcher to other question types, which half of all survey respondents requested (however prompted); completing the screen reader announcement of test results, for which the groundwork is in place but the renderer must be restructured to mutate rather than replace its results container; and defining a moderated contribution model for the documentation page, answering the governance concern raised in the survey, so that experienced question authors can extend it without disputes over content. Finally, the changes themselves are candidates for contribution upstream to the CodeRunner project, which would expose them to a far larger user base and subject them to review by the tool's maintainers. 

@@ -1,13 +1,145 @@
 \section{Product}\label{product}
 
-
-
 \subsection{Implementation}
-Provide implementation details: language used, architecture (e.g. server and client, or hub and spoke). Explain how you secured personal details.
+
+% TODO: opening paragraph -- languages and architecture recap. PHP for the
+% Moodle-side changes (editor form, renderers, behaviour, docs page),
+% JavaScript as Moodle AMD modules (compiled with Grunt via the NodeJS
+% container), CSS for styling, Markdown for documentation content, shell
+% scripts for the development workflow. 
+The implementation of this project uses PHP for Moodle-side changes, JavaScript for Moodle AMD modules (compiled with Grunt via the NodeJS container), CSS for styling, Markdown for documentation content, shell scripts for development workflow.
+
+\subsubsection{Development Environment}
+% TODO: describe the docker-compose stack (webserver, database, Jobeinabox,
+% Selenium, NodeJS), the bind mounts injecting both plugins, and the three
+% automation scripts: compile-amd-coderunner.sh, phpunit.sh, behat.sh.
+The development environment uses Docker~\cite{dockerjournal} (Figure~\ref{fig:docker_project}), which deploys several containers including Selenium for testing and NodeJS for compiling. The environment maintains a virtual volume containing the entirety of Moodle and its files, then Docker mounts the files for CodeRunner and its dependency plugin. The docker environment can be used by executing shell scripts; a couple of scripts were implemented for the purpose of automating environment variable assignment and executing complex commands for Behat and compiling AMD modules in one go.
+
+
+\begin{lstlisting}[style=shellcmd]
+$ docker volume ls -q --filter "name=moodle-docker" | xargs docker volume rm
+\end{lstlisting}
+
+This setup meets \textbf{DE1} because the Docker container is isolated and the data produced within is contained. Deleting the hosted volumes within Docker allows starting over without config file hunting across the host.
+\textbf{DE2} is met using a shell script `quick-start.sh` which loads the environment variables required to start and executes the docker-compose bin to init and create the environment.
+\textbf{DE3} is fufilled by the Selenium container, the Selenium image loads a headless chrome browser controlled by Behaviour Driven Development tests (BDD)~\cite{northbdd} using Behat.
+
+\subsubsection{Test Case Management}
+\textbf{FR1} was met by leveraging an existing capability of Moodle's forms library (formslib). The library's \texttt{repeat\_elements()} helper, which CodeRunner already used to render one group of fields per test case, supports author-facing addition of rows but offers row deletion only as an opt-in: its final parameter nominates a button within each repeated group as that row's delete control. A submit button named \texttt{deletetestcase} was therefore added to the repeated group and its name passed to \texttt{repeat\_elements()}. Moodle registers each \texttt{deletetestcase[i]} as a no-submit button: clicking it reloads the form without validating or saving, and on the rebuild formslib omits the deleted row and records the deletion in a hidden field so that it survives further reloads; the deletion only becomes permanent when the question is saved. The button's visible label is not derived from its name; it is looked up with \texttt{get\_string('deletetestcase', 'qtype\_coderunner')} from the plugin's language file, to which the new strings were added, keeping the label translatable like every other string in the plugin.
+
+To guard against accidental deletion, a small script was attached to each delete button that asks for confirmation via the browser's native dialog. The script does not replace the button's behaviour: it merely intercepts the click and cancels the submission when the author declines, so a confirmed click proceeds exactly as it would have without the script. This makes it a progressive enhancement~\cite{mdnprogressiveenhancement}: were JavaScript unavailable, deletion would still work, just without the prompt.
+
+Finally, the delete button alone was not enough, because CodeRunner accessed test cases by contiguous index, e.g. $[0,1,2,3,4]$. If the author deletes test case 1, the submitted arrays instead have the keys $[0,2,3,4]$, a hole in the sequence. Any loop that assumed a dense range would both read the missing index and silently drop the last row, so every such loop had to change to iterate over the keys actually present. Four places were affected: the form-building loop that attaches help buttons and per-row rules to each test case, the validation of Twig-rendered fields, the validation that counts non-empty tests, and the function that copies test cases from the form into the database on save. The validation of non-empty tests is the most interesting case: the fields \texttt{testcode}, \texttt{stdin} and \texttt{expected} are submitted as three parallel arrays sharing row keys, and the old code walked them with a single counter, assuming they were equal in length with no holes. The new code instead takes the union of the three arrays (PHP's \texttt{+} operator on arrays, which keeps every key appearing in any operand) and iterates over the \texttt{array\_keys()} of the result, so a row is validated if any one of its three fields is present, whatever its key happens to be.
+
+\textbf{FR2} was only partially met, and the compromise was deliberate. Upstream, a new question opens with five blank test cases, and the add button appends three more per click, an amount CodeRunner inherited from a Moodle core constant rather than choosing itself. The core constant was first replaced with plugin-owned ones set to one, which met the requirement exactly: a new question opened with a single blank test case and each click added exactly one more. Once the Behat suite was runnable inside the container, however, this turned out to break several of the upstream acceptance tests, which fill a freshly opened form up to its third test case (\texttt{id\_testcode\_2}) and so assume at least three blanks exist before any button is clicked. Rather than rewriting upstream test fixtures for what is largely a cosmetic gain, both constants were reset to three, the smallest initial count for which the unmodified upstream suite still passes. The result improves on upstream (three initial blanks rather than five) but is not exact; the ideal solution, letting the author choose how many rows each click adds, was judged too low in value relative to its cost in test maintenance and deferred. In practice the gap is also narrowed by FR1: surplus blank rows can now simply be deleted.
+
+\subsubsection{Precheck Rendering Fix}
+\textbf{FR4} was met through in-browser analysis followed by a deliberately small fix. When the Precheck option on the author page is set to `Selected', each test case gains an extra div holding its test-type selector, and this div was rendering outside the test case's column flow. Inspecting the live page revealed why: the stylesheet lays each test case row out as a flex container, but the script that shows and hides the selector (necessarily client-side, since the div must react to the Precheck setting without a page reload) re-showed it with an inline \texttt{display: block}. Inline styles override the stylesheet, so every toggle dropped the div out of the flex layout. The fix was a single word in the \texttt{authorform.js} module: re-show the div with \texttt{display: flex} instead. The size of the change is out of all proportion to the analysis required to locate it, which is arguably the mark of a well-aimed fix rather than a small effort.
+
+With the div rendering correctly, one styling wrinkle remained. The selector sat at the bottom of each test case card, where the card's rounded-corner styling belongs to the last visible element, but whether the selector is visible depends on the Precheck setting. That left two options: reorder the form elements so the selector sits in the middle of the card, or dynamically pass the rounded-corner styling between the selector and the element above it as visibility changes. The reorder was chosen, a small server-side change to the form definition, accepting the minor cost that authors accustomed to the old layout must find the selector in its new position; since it moved past only a single element group, that cost is low. The alternative would have tied presentation logic to the Precheck state for a purely cosmetic outcome.
+
+\subsubsection{Save Draft Button}
+To meet \textbf{FR6}, a Save draft button was added to the controls beneath the answer box. Previously, a student's only explicit way to save was the Check button (a graded submission that can cost marks under the question's penalty regime~\cite{CodeRunner2016}), so saving work-in-progress meant either paying that penalty or trusting the browser not to lose the page. The new button provides a zero-cost, on-demand persistence point: it stores the current answer and changes nothing about grading. It should be noted that Moodle does periodically (every 60s) automatically save the answer box content. It is, in short, an affordance~\cite{designofeveryday}.
+
+The change is small (28 lines across three files) and lives entirely in the companion behaviour plugin rather than the question type. This placement was deliberate. In Moodle's question architecture~\cite{moodlequestionbehaviours}, the question type defines what a question is, while the behaviour governs how responses are processed; a save control is a submission concern, so it belongs to the behaviour. It also means any question using this behaviour gains the button, and the question type remains presentation-only.
+
+The implementation exposes existing machinery rather than building new. The renderer emits a submit button whose name is generated by \texttt{get\_behaviour\_field\_name('savedraft')}, Moodle's namespacing scheme that routes the click to the correct question's behaviour even when several questions share a quiz page; the construction mirrors the core \texttt{submit\_button} renderer so the button participates in the question engine's usual JavaScript handling, and it is rendered inert on read-only review pages. The behaviour then declares \texttt{savedraft} as expected data, but only while the attempt is unfinished; the engine discards any submitted field a behaviour has not declared, so this single declaration is what makes the button function, and the guard ensures a closed attempt can never be drafted against. Notably, no processing code was required at all: because \texttt{savedraft} is not one of the engine's recognised grading actions, the submission falls through to the engine's default save path, which stores the response as a new step without grading or penalty. The feature's label is resolved from a new language string, keeping it translatable like the rest of the plugin.
+
+\subsubsection{Layout Switcher}
+To meet \textbf{FR7}, a per-question layout switcher was built offering two arrangements: the traditional stacked view, and a side-by-side view that places the question text and the answer box in adjacent columns. The server-side renderer was changed to wrap the two halves in dedicated \texttt{question\_box} and \texttt{answer-box} containers (CSS can only arrange what the markup separates), and a new AMD module, \texttt{layoutswitcher.js}, is initialised for each CodeRunner question on the page. The module injects a pair of toggle buttons and implements the modes as a single CSS class toggled on the question's outer div: the JavaScript only flips state, while the layout rules themselves live in the stylesheet.
+
+In the side-by-side mode, a draggable divider separates the two boxes. Dragging recomputes the boxes' widths as ratios, written to their \texttt{flex} properties, so a chosen split survives later window resizes proportionally instead of pinning either side to a pixel width; both sides are clamped to a minimum width (150 pixels, or half the available space when narrower) so neither box can be dragged to nothing or past the other. One subtlety is worth recording: switching modes explicitly clears any inline \texttt{flex} values a previous drag left behind, because inline styles would otherwise override the stylesheet's rules indefinitely, the same class of fault as the Precheck rendering bug above.
+
+The chosen layout persists in \texttt{sessionStorage} under a single key, recorded per question, so two questions on the same quiz page can hold different layouts. The stored entry began life as a bare layout string and later grew into a small object shared with the info panel state of the next section; a migration path still accepts the legacy form. \texttt{sessionStorage} was a deliberate choice: it needs no server round-trip and no database schema change, and it holds nothing personal, only a layout preference keyed by question id, a point the Security section returns to.
+
+Finally, the saved layout is applied before the page paints. Because the AMD module loads asynchronously, a question saved as side-by-side would otherwise render stacked and visibly jump when the module initialised, a layout shift~\cite{webdevcls}: the jank problem discussed in Section~\ref{process}. The renderer therefore emits a small inline script ahead of the question markup that reads \texttt{sessionStorage} and applies the layout class before first paint, eliminating the flash; it is wrapped in a try/catch that falls back to the stacked default wherever \texttt{sessionStorage} is unavailable. Throughout the module, every DOM lookup is guarded, so a question rendered without the expected markup silently receives no controls; and the entire feature is client-side, with no question-processing code touched, so it carries no grading or data-storage risk.
+
+\subsubsection{Info Panel Collapse}
+To meet \textbf{FR8}, the student is given a way to reclaim the width that a question page holds in reserve. Two separate things waste horizontal space on a CodeRunner question, and both matter more here than for ordinary question types, because code wants room: Moodle floats a fixed-width info panel (question number, status, marks) beside every question, indenting all of its content; and the Boost theme caps the width of the page content as a whole, leaving dead margins on either side. A small toggle button added to each question's info panel reclaims both at once. Collapsing removes the panel's float, so it stops reserving its column and reflows as an ordinary block while the question content expands beneath it, and simultaneously raises the theme's page-width cap so the whole content area widens into the margins.
+
+The feature went through one design iteration worth recording. The first version hid the panel entirely (shrinking it to the size of the toggle button and hiding its children), which reclaimed the column at the cost of the question number and marks disappearing with it. The final version reflows rather than hides: no information is lost; it merely stops costing a dedicated column. The distinction between removing content and removing the space reserved for content is what the requirement was really asking for.
+
+Two details deserve mention. First, the page-width half of the feature must coordinate across questions: a quiz page can hold several questions, all sharing one page-width cap. The module therefore keeps a page-level set of every question whose panel is currently collapsed; the cap is lifted when the first panel collapses and restored only when the set is empty again, since restoring it any sooner would shrink the page out from under another question still relying on the extra width. Second, the page-level step is deliberately theme-tolerant: it targets a wrapper element specific to Boost-family themes, and on any theme without that markup it is a guarded no-op; the panel itself still collapses normally, so the feature degrades to its within-question half rather than breaking.
+
+The collapsed state persists per question in the same \texttt{sessionStorage} record as the layout choice (this is the change that grew the stored entry from a bare layout string into the small object described in the previous section), and the renderer's pre-paint script applies it before first paint, giving the collapse the same protection against the flash-and-jump behaviour as the layout itself. On narrow (mobile-width) screens the toggle is hidden entirely: the info panel already stacks above the question there, so there is no column to reclaim.
+
+\subsubsection{Accessibility}
+To meet \textbf{NFR2}, the author page was audited with Chrome's Lighthouse tool, whose accessibility checks derive from the Web Content Accessibility Guidelines~\cite{w3c_wcag22_2023}, and the findings were worked through. The page initially scored 93\%. The largest issue was that several of the page's selects are rendered by Moodle as grouped controls (the question type, give-up and feedback groups) where the visible label belongs to the group rather than to the select inside it, leaving the selects with no accessible name. This was fixed with \texttt{aria-labelledby} attributes~\cite{w3c_wai_aria12_2023} pointing each select at the id of its group's existing label element. \texttt{aria-labelledby} was chosen over \texttt{aria-label} on purpose: it reuses the visible text instead of duplicating it, so a future edit to the label cannot silently desynchronise the accessible name. This took the audit score to 97\%, and the remaining three percent lies in TinyMCE, Moodle's bundled rich-text editor, which the plugin cannot modify; this measured ceiling is where the requirement's figure of ``97\%, the maximum attainable given third-party components'' comes from.
+
+The new controls this project introduced were held to the same standard. The layout switcher's buttons are icon-only (two squares against one), meaningless to a screen reader, so both carry descriptive \texttt{aria-label}s; the info panel toggle does the same, updating its label to match its state. The same buttons also gained visual contrast: they originally sat at low opacity with pale borders, making the active state nearly indistinguishable, and were reworked with solid backgrounds, darker borders and an unambiguous active style, so state is perceivable without relying on subtle opacity differences.
+
+One piece of accessibility work remains unfinished, and is reported as such. When a student runs their code, the test results should be announced to a screen reader when they arrive; \texttt{aria-live}~\cite{w3c_wai_aria12_2023} was added to the results container and the results message given an addressable id in preparation. It does not yet work, and the cause is known: the results div is replaced wholesale on submission rather than mutated in place, so the live-region registration is destroyed along with the element it was attached to. Fixing this properly means restructuring how the renderer swaps in results, which is scoped as future work.
+
+\subsubsection{Documentation Page}
+To meet \textbf{NFR3}, a documentation page was added to the plugin itself. Upstream CodeRunner's documentation lives on an external site, which the editor's help strings link out to; an author who gets stuck mid-task must therefore leave Moodle and search a general-purpose manual. The new page instead serves task-focused documentation from inside the plugin, following the task-oriented, scannable structure recommended for developer documentation~\cite{googledevstyle}: a new script, \texttt{docs.php}, renders Markdown pages within the normal Moodle page chrome, so the documentation is styled and navigated like part of the site the author is already working in.
+% TODO (reachability): add a sentence here once the editing-form link is
+% implemented, e.g. "The page is linked directly from the question editing
+% form via ...".
+
+The mechanics were chosen for simplicity of authorship. Content is plain Markdown in a directory inside the plugin, rendered with Moodle's bundled MarkdownExtra parser (introducing no new dependency), and the directory is scanned recursively for pages, so adding documentation means adding a file, with no registration step. One rendering defect had to be fixed along the way: MarkdownExtra emits headings without \texttt{id} attributes, so in-page links to sections silently did nothing. A custom \texttt{header\_id\_func} was supplied that slugifies each heading into an anchor id, restoring in-page navigation. This in turn surfaced a PHP 8.1 deprecation notice inside the parser itself, which is silenced narrowly around the single transform call, with a comment recording why and a note to contribute a proper fix upstream.
+
+Because \texttt{docs.php} turns a request parameter into a file path, it is the one place among the project's changes that handles a classically dangerous input, the path traversal weakness~\cite{cwe22}. The parameter is first cleaned by Moodle's \texttt{optional\_param()} with \texttt{PARAM\_PATH}, then resolved with \texttt{realpath()} and required to lie inside the documentation directory; traversal attempts and nonexistent pages alike raise a Moodle exception rather than reaching the filesystem. The script was also written to be testable: it declares its globals explicitly so PHPUnit can include it from within a test, and its unit tests attack exactly this path-containment defence, as the Verification section describes. The content written for the page comprises a revised editor-usage guide and a new question-templating guide.
+
+\subsubsection{Security and Personal Data}
+% TODO: no personal data is collected by any of the changes. New state lives
+% in sessionStorage and contains only layout preferences keyed by question
+% id. The docs page validates its only input parameter against directory
+% escape. Code execution remains isolated on the Jobe server.
+% TODO: confirm and state that survey responses were collected anonymously.
 
 \subsection{Verification \& Validation}
 
-How did you verify that your software was debugged and worked correctly?
+\subsubsection{Verification}
+Automated verification rests on the two test harnesses of the development environment, each runnable with a single script. For the documentation page, PHPUnit tests were written. \texttt{docs.php} is a plain script rather than a class, so there is nothing to call directly: the tests instead fake the request by setting \texttt{\$\_GET} (which \texttt{optional\_param()} reads) and include the script inside an output buffer, capturing whatever it renders. Three tests cover the page: a real document renders; a nonexistent page raises an exception; and a traversal attempt requesting \texttt{../../version.php} is rejected. That last target was chosen with care: it is a real file outside the documentation directory, so the test cannot be satisfied by a naive existence check and instead attacks the path-containment defence directly.
 
-How did you validate that you had implemented all the functional and non-functional requirements?
+For regression testing, the plugin's upstream Behat suite was run: browser-driven acceptance tests, executed against the Selenium container by \texttt{behat.sh}. Their evidential value comes from their provenance (tests not written by this project, exercising code it changed), so passing them is independent evidence that the test case indexing rewrite preserved existing behaviour. The suite also demonstrably earned its keep: it exposed that the one-blank test case defaults broke upstream scenarios, forcing the reset to three described under FR2. That is a concrete regression caught by the harness before any user saw it, and it justifies the effort spent making the suite runnable (DE3).
 
+The remaining evidence is measured or manual. Lighthouse audits provide the quantitative check for NFR2, with the before and after scores (93\% and 97\%) recorded at the time of the change. The user-interface features (the layout switcher, the info panel collapse, the save draft button and the precheck fix) were verified manually, both directly and through the closed feedback loop of peers and supervisor described in Section~\ref{process}. The limitation is stated plainly: automated coverage is concentrated on the documentation page and the upstream suite, and the new UI behaviour has no automated tests of its own.
+
+\subsubsection{Validation}
+Validation against the requirements is summarised in the traceability table (Table~\ref{tab:traceability})~\cite{goteltraceability}, which traces each requirement from Section~\ref{process} to its implementation, the evidence that verified it, and its status. The statuses are kept honest rather than uniform: most requirements are met, FR2 is met partially with the trade-off argued in its implementation section, and two were deferred.
+
+The deferred requirements were scoped out deliberately rather than silently dropped. FR5 (hints for hidden test cases) and FR9 (a copy button on code blocks) both originated in the user survey, and neither is abandoned: the Results section reframes the hint mechanism as the broader question of how much information hidden test cases should reveal, and identifies the copy button as future work with a high benefit-to-cost ratio. Deferring them was a scoping decision made against the time remaining, and the reasoning is recorded where the requirements came from, in the survey analysis, rather than asserted here.
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{12pt}
+\caption{Requirements traceability: each requirement from Section~\ref{process}, its implementation, and its verification evidence.}
+\label{tab:traceability}
+\begin{tabular}{@{}l p{0.30\linewidth} p{0.22\linewidth} p{0.14\linewidth} l@{}}
+\toprule
+\textbf{ID} & \textbf{Requirement} & \textbf{Implementation} & \textbf{Verified by} & \textbf{Status} \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Development environment}} \\
+\addlinespace[2pt]
+DE1 & Environment isolated from host & Docker compose stack & Manual & \statusmet \\
+DE2 & Single command, repeatable setup & quick-start / compose scripts & Manual & \statusmet \\
+DE3 & Regression testable & phpunit.sh, behat.sh & PHPUnit, Behat & \statusmet \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Functional requirements}} \\
+\addlinespace[2pt]
+FR1 & Delete test cases & repeat\_elements delete button & Behat, manual & \statusmet \\
+FR2 & Add exact number of test cases & NUM\_TESTCASES 3/3 & Behat, manual & \statuspartial \\
+FR3 & Help content stays visible & % TODO: implemented? verify
+
+ & % TODO
+ & % TODO: \statusmet / \statusdeferred
+ \\
+FR4 & Precheck renders in correct column & authorform.js fix & Manual & \statusmet \\
+FR5 & Hints for hidden test cases & Not implemented & -- & \statusdeferred \\
+FR6 & Save work on demand & Save Draft button & Manual & \statusmet \\
+FR7 & Manage question layout & Layout switcher & Manual & \statusmet \\
+FR8 & Reclaim margin space & Info panel collapse & Manual & \statusmet \\
+FR9 & Copy button on code blocks & Not implemented & -- & \statusdeferred \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Non-functional requirements}} \\
+\addlinespace[2pt]
+NFR1 & Visual consistency & styles.css rework & Peer review & \statusmet \\
+NFR2 & Lighthouse accessibility $\geq$ 97\% & ARIA labels & Lighthouse audit & \statusmet \\
+NFR3 & Effective, reachable documentation & docs.php + content & PHPUnit, survey & \statusmet \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -2,6 +2,9 @@
 \documentclass[11pt,titlepage,dvipsnames,table,xcdraw]{article}
 \usepackage{strath-dissertation}
 \usepackage{setspace}
+\usepackage{geometry}
+
+\geometry{a4paper,portrait,margin=2.5cm}
 
 
 \usepackage{babel}
@@ -22,6 +25,60 @@
 \renewcommand{\familydefault}{\sfdefault}
 \DeclareFontSeriesDefault[sf]{bf}{bx}
 
+% Define code block styling
+%
+\usepackage{color}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+% Traceability table styling (Product section).
+\usepackage{booktabs}
+% Allows the [H] specifier to pin a figure exactly in reading order.
+\usepackage{float}
+% Side-by-side sub-figures with their own captions.
+\usepackage{subcaption}
+% Floats on float-only pages sit at the top instead of being vertically
+% centred (the article class default stretches equal glue above and below).
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
+\newcommand{\statusmet}{\textcolor{OliveGreen}{Met}}
+\newcommand{\statuspartial}{\textcolor{BurntOrange}{Partial}}
+\newcommand{\statusdeferred}{\textcolor{gray}{Deferred}}
+\lstdefinelanguage{Typescript-min}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with, type, let, const},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  ndkeywords={class, export, boolean, throw, implements, import, this },
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  sensitive=true
+}
+% Style for short shell commands: grey box, prompt marker, no line numbers.
+\lstdefinestyle{shellcmd}{
+  language=bash,
+  backgroundcolor=\color{lightgray},
+  basicstyle=\ttfamily\small,
+  numbers=none,
+  frame=single,
+  framerule=0pt,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+  breaklines=true,
+  showstringspaces=false,
+  keywordstyle=\color{black},
+  stringstyle=\color{black},
+  identifierstyle=\color{black},
+  prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}}
+}
 \begin{document}
 
 %--------------------------------
@@ -39,7 +96,7 @@
 \vspace{5mm}
 \depttext{\deptname}
 \vspace{5mm}
-\datetext{August, 2021}
+\datetext{August, 2026}
 \end{titlepage}
 
 %--------------------------------
@@ -52,7 +109,7 @@
 % Setting counter depth.
 %--------------------------------
 \setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{3}
 
 %--------------------------------
 % The front matter.
