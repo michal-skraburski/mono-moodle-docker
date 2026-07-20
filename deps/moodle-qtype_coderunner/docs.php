@@ -35,7 +35,7 @@ require_once($CFG->libdir . '/markdown/Markdown.php');
 require_once($CFG->libdir . '/markdown/MarkdownExtra.php');
 
 $docsdir = __DIR__ . '/docs/editor/';
-$page = optional_param('page', 'index', PARAM_PATH);
+$page = optional_param('page', 'index.md', PARAM_PATH);
 $file = realpath($docsdir . '/' . $page);
 
 
@@ -94,6 +94,33 @@ $md->header_id_func = function ($headervalue) {
 // End fix
 
 echo $OUTPUT->header();
+$contents = file_get_contents($file);
+
+// Any page may include an auto-generated list of the example question
+// exports in example_questions/ by placing this marker in its markdown.
+// Dropping a new .xml file into that directory is all that's needed for
+// it to appear — no page edits required.
+$listmarker = '<!-- EXAMPLE_QUESTIONS_LIST -->';
+if (strpos($contents, $listmarker) !== false) {
+    $examplefiles = glob($docsdir . '/example_questions/*.xml') ?: [];
+    sort($examplefiles);
+    if ($examplefiles) {
+        $list = '';
+        foreach ($examplefiles as $examplefile) {
+            $filename = basename($examplefile);
+            $slug = substr($filename, 0, -4);
+            $title = ucfirst(str_replace(['-', '_'], ' ', $slug));
+            // Encode the filename: raw spaces (or parentheses) in the URL
+            // stop Markdown from recognising the link at all.
+            $list .= "- [$title](import_example.php?slug=" . rawurlencode($slug) . ")"
+                . "   -   [download](docs.php?page=example_questions/" . rawurlencode($filename) . ")\n";
+        }
+    } else {
+        $list = '*No example questions have been added yet.*';
+    }
+    $contents = str_replace($listmarker, $list, $contents);
+}
+
 // MarkdownExtra's doExtraAttributes() calls preg_match_all() on a null $attr
 // whenever a heading has no explicit {#id}/{.class} block, which is the
 // normal case now that header_id_func always supplies a default id. That's
@@ -101,6 +128,6 @@ echo $OUTPUT->header();
 // it, so silence just that during the transform.
 // TODO: maybe do a pull request on that
 $previouserrorlevel = error_reporting(E_ALL & ~E_DEPRECATED);
-echo $md->transform(file_get_contents($file));
+echo $md->transform($contents);
 error_reporting($previouserrorlevel);
 echo $OUTPUT->footer();
