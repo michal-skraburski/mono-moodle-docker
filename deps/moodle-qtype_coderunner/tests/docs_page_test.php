@@ -48,6 +48,11 @@ class docs_page_test extends Testcase
     private function render_docs_page(string $page): string
     {
         global $CFG;
+        // Fresh page/output globals per render: $PAGE's state machine only
+        // advances, so a second $OUTPUT->header() on the same page object
+        // would throw once more than one page is rendered per test run.
+        $GLOBALS["PAGE"] = new \moodle_page();
+        $GLOBALS["OUTPUT"] = new \bootstrap_renderer();
         $_GET["page"] = $page;
         ob_start();
         try {
@@ -65,6 +70,57 @@ class docs_page_test extends Testcase
     {
         $output = $this->render_docs_page("index.md");
         $this->assertStringContainsString("Coderunner Question Editor", $output);
+    }
+
+    public function test_default_page_is_index()
+    {
+        global $CFG;
+        // No 'page' parameter at all: docs.php must fall back to index.md,
+        // since that's what the docs links on the author form produce.
+        $GLOBALS["PAGE"] = new \moodle_page();
+        $GLOBALS["OUTPUT"] = new \bootstrap_renderer();
+        unset($_GET["page"]);
+        ob_start();
+        try {
+            include $CFG->dirroot . "/question/type/coderunner/docs.php";
+            $output = ob_get_clean();
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            throw $e;
+        }
+        $this->assertStringContainsString("Coderunner Question Editor", $output);
+    }
+
+    public function test_xml_page_is_served_as_download()
+    {
+        global $CFG;
+        // .xml files under the docs dir are streamed verbatim (as a download)
+        // rather than being rendered as markdown.
+        $file = $CFG->dirroot .
+            "/question/type/coderunner/docs/editor/example_questions/01-hello-world.xml";
+        $output = $this->render_docs_page("example_questions/01-hello-world.xml");
+        $this->assertSame(file_get_contents($file), $output);
+    }
+
+    public function test_examples_page_lists_examples()
+    {
+        $output = $this->render_docs_page("example_questions.md");
+        // The <!-- EXAMPLE_QUESTIONS_LIST --> marker must be replaced by a
+        // generated entry per xml file: an import link and a download link.
+        $this->assertStringNotContainsString("EXAMPLE_QUESTIONS_LIST", $output);
+        $this->assertStringContainsString("01 hello world", $output);
+        $this->assertStringContainsString("import_example.php?slug=01-hello-world", $output);
+        $this->assertStringContainsString(
+            "docs.php?page=example_questions/01-hello-world.xml",
+            $output
+        );
+    }
+
+    public function test_walkthroughs_page()
+    {
+        $output = $this->render_docs_page("example_walkthroughs.md");
+        $this->assertStringContainsString("Example Walkthroughs", $output);
+        $this->assertStringContainsString("import_example.php?slug=01-hello-world", $output);
     }
 
     public function test_outofbounds_page()

@@ -57,9 +57,14 @@ class qtype_coderunner_renderer extends qtype_renderer {
         $divid = "qtype_coderunner_problemspec$qid";
         $params = $question->parameters;
         $queid = $qa->get_outer_question_div_unique_id();
-        $this->page->requires->js_call_amd('qtype_coderunner/layoutswitcher', 'layoutSwitcher', [$queid]);
+        // The DOM id above is per-attempt (it embeds the question usage id),
+        // so it changes every time a question preview is reloaded (each
+        // reload starts a fresh usage) even though it's still "the same"
+        // question to the user. Persist the layout choice keyed by the
+        // stable question id instead, so it survives that.
+        $this->page->requires->js_call_amd('qtype_coderunner/layoutswitcher', 'layoutSwitcher', [$queid, $qid]);
 
-        $qtext = $this->layout_prepaint_script($queid);
+        $qtext = $this->layout_prepaint_script($queid, $qid);
         $qtext .= html_writer::start_tag('div', ['class' => 'question_box']);
         if (isset($question->initialisationerrormessage) && $question->initialisationerrormessage) {
             $qtext .= "<div class='initialisationerror'>{$question->initialisationerrormessage}</div>";
@@ -206,15 +211,17 @@ class qtype_coderunner_renderer extends qtype_renderer {
      * and seamless.
      *
      * @param string $queid the id of the outer .que.coderunner div for this question.
+     * @param int $qid the stable question id used as the sessionStorage key.
      * @return string HTML fragment containing the inline script.
      */
-    protected function layout_prepaint_script($queid) {
+    protected function layout_prepaint_script($queid, $qid) {
         $queidjs = json_encode($queid);
+        $storagekeyjs = json_encode((string) $qid);
         $js = <<<JS
 (function() {
     try {
         var obj = JSON.parse(sessionStorage.getItem('coderunner_layout') || '{}');
-        var entry = obj[$queidjs];
+        var entry = obj[$storagekeyjs];
         if (typeof entry === 'string') {
             entry = {layout: entry};
         }

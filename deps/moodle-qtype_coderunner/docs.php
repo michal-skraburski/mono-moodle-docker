@@ -30,6 +30,10 @@ use core\exception\moodle_exception;
 // scope (e.g. a PHPUnit test), not just when run as the top-level script.
 global $PAGE, $OUTPUT, $CFG;
 
+require_once($CFG->libdir . '/markdown/MarkdownInterface.php');
+require_once($CFG->libdir . '/markdown/Markdown.php');
+require_once($CFG->libdir . '/markdown/MarkdownExtra.php');
+
 $docsdir = __DIR__ . '/docs/editor/';
 $page = optional_param('page', 'index', PARAM_PATH);
 $file = realpath($docsdir . '/' . $page);
@@ -48,7 +52,18 @@ $ext = pathinfo($file, PATHINFO_EXTENSION);
 if ($ext == 'jpg') {
     header('Content-Type:' . 'image/jpeg');
     readfile($file);
-    exit;
+    // Top-level return ends the script just like exit, but also lets the
+    // PHPUnit tests include this file without terminating the test run.
+    return;
+}
+
+// Serve example question exports (Moodle XML) as downloads rather than
+// rendering them, so authors can import them into their question bank.
+if ($ext == 'xml') {
+    header('Content-Type: application/xml');
+    header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+    readfile($file);
+    return;
 }
 
 $pages = [];
@@ -69,10 +84,6 @@ $PAGE->set_title('CodeRunner Documentation');
 $PAGE->requires->css(new moodle_url('/question/type/coderunner/docs/editor/styles/docs.css'));
 
 // This block of code fixes the lack of id tags attached to headers.
-global $CFG;
-require_once($CFG->libdir . '/markdown/MarkdownInterface.php');
-require_once($CFG->libdir . '/markdown/Markdown.php');
-require_once($CFG->libdir . '/markdown/MarkdownExtra.php');
 
 $md = new \Michelf\MarkdownExtra();
 $md->header_id_func = function ($headervalue) {

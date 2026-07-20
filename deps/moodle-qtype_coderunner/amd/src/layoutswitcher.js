@@ -32,8 +32,12 @@ define([], function () {
   /**
    * Inject the layout toggle controls and wire up handlers.
    * @param {string} questionId The id attribute of the .que.coderunner element.
+   * @param {string} storageKey The stable (per-question, not per-attempt) key
+   *   under which the layout choice is persisted. questionId itself embeds
+   *   the question usage id, which changes every time e.g. a question
+   *   preview is reloaded, so it can't be used as the persistence key.
    */
-  function layoutSwitcher(questionId) {
+  function layoutSwitcher(questionId, storageKey) {
     const que = document.getElementById(questionId);
     if (!que) {
       return;
@@ -67,14 +71,14 @@ define([], function () {
         infoToggleBtn.innerHTML = collapsed ? '&#8250;' : '&#8249;';
         infoToggleBtn.title = collapsed ? 'Show question info' : 'Hide question info';
         infoToggleBtn.ariaLabel = infoToggleBtn.title;
-        saveQuestionState(questionId, { infoCollapsed: collapsed });
+        saveQuestionState(storageKey, { infoCollapsed: collapsed });
       };
 
       infoToggleBtn.addEventListener('click', () => {
         applyInfoCollapse(!que.classList.contains('info-collapsed'));
       });
 
-      applyInfoCollapse(getQuestionState(questionId).infoCollapsed);
+      applyInfoCollapse(getQuestionState(storageKey).infoCollapsed);
     }
 
     let dragStartX = 0;
@@ -152,13 +156,13 @@ define([], function () {
         splitBtn.classList.remove('active');
 
       }
-      saveQuestionState(questionId, { layout: mode });
+      saveQuestionState(storageKey, { layout: mode });
     }
 
     splitBtn.addEventListener('click', () => applyLayout('split'));
     stackBtn.addEventListener('click', () => applyLayout('stacked'));
 
-    applyLayout(getQuestionState(questionId).layout);
+    applyLayout(getQuestionState(storageKey).layout);
   }
 
   /**
