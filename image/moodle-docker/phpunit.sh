@@ -2,6 +2,8 @@
 export MOODLE_DOCKER_WWWROOT=./moodle
 export CODERUNNER_REPO=../../deps/moodle-qtype_coderunner/
 export CR_DEPEND_REPO=../../deps/moodle-qbehaviour_adaptive_adapted_for_coderunner/
+export CODERUNNER_REPO_OLD=../../deps/moodle-qtype_coderunner/
+export CR_DEPEND_REPO_OLD=../../deps/moodle-qbehaviour_adaptive_adapted_for_coderunner/
 # Choose a db server (Currently supported: pgsql, mariadb, mysql, mssql, oracle)
 export MOODLE_DOCKER_DB=pgsql
 export MOODLE_DOCKER_WEB_HOST=0.0.0.0
