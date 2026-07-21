@@ -55,11 +55,11 @@ $CFG->smtphosts = 'mailpit:1025';
 $CFG->noreplyaddress = 'noreply@example.com';
 
 // Debug options - possible to be controlled by flag in future..
-$CFG->debug = (E_ALL); // DEBUG_DEVELOPER
-$CFG->debugdisplay = 1;
-$CFG->debugstringids = 1; // Add strings=1 to url to get string ids.
-$CFG->perfdebug = 15;
-$CFG->debugpageinfo = 1;
+$CFG->debug = (0); // DEBUG_DEVELOPER
+$CFG->debugdisplay = 0;
+$CFG->debugstringids = 0; // Add strings=1 to url to get string ids.
+$CFG->perfdebug = 0;
+$CFG->debugpageinfo = 0;
 $CFG->allowthemechangeonurl = 1;
 $CFG->passwordpolicy = 0;
 $CFG->cronclionly = 0;
