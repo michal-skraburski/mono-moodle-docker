@@ -50,7 +50,12 @@ if (!$file || strpos($file, realpath($docsdir)) !== 0) {
 // This catches any JPEGs, may be due for removal
 $ext = pathinfo($file, PATHINFO_EXTENSION);
 if ($ext == 'jpg') {
-    header('Content-Type:' . 'image/jpeg');
+    // Under PHPUnit the framework has already emitted output, so guard the
+    // header() call — it would otherwise fatal ("headers already sent"). The
+    // tests only assert on the streamed body, so skipping the header is fine.
+    if (!headers_sent()) {
+        header('Content-Type: image/jpeg');
+    }
     readfile($file);
     // Top-level return ends the script just like exit, but also lets the
     // PHPUnit tests include this file without terminating the test run.
@@ -60,8 +65,12 @@ if ($ext == 'jpg') {
 // Serve example question exports (Moodle XML) as downloads rather than
 // rendering them, so authors can import them into their question bank.
 if ($ext == 'xml') {
-    header('Content-Type: application/xml');
-    header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+    // See the headers_sent() note above: guarded so the download path stays
+    // includable from the PHPUnit tests.
+    if (!headers_sent()) {
+        header('Content-Type: application/xml');
+        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+    }
     readfile($file);
     return;
 }
