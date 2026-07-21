@@ -28,7 +28,7 @@ Feature: Navigate the CodeRunner documentation and import example questions
     And "//a[contains(@href, '01-hello-world.xml')]" "xpath_element" should exist
     When I follow "Example walkthroughs"
     Then I should see "Example Walkthroughs"
-    When I follow "index"
+    When I follow "Question editor reference"
     Then I should see "Coderunner Question Editor"
 
   Scenario: Import an example question into a course from the examples page
