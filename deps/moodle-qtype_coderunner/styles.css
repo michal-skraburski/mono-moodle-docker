@@ -524,7 +524,13 @@ li.bulktest.coderunner.context.quiz {
 
 /* Michal S changes */
 
-
+body#page-question-type-coderunner-docs #topofscroll {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+body#page-question-type-coderunner .coderunner-docs-link {
+  text-align:right; 
+}
 body#page-question-type-coderunner div[id^=id_testcasehdrcontainer] {
   /* Center the div within the layout margins */
   margin-left:18px;
@@ -659,6 +665,7 @@ body#page-question-type-coderunner input.testcasedelete {
   max-width:1200px !important;
 }
 
+
 /* Bootstrap referenced */
 @media (max-width: 767.98px) {
     /* Disappear the button when mobile */
@@ -668,6 +675,11 @@ body#page-question-type-coderunner input.testcasedelete {
     .que.coderunner .question_box,
     .que.coderunner .answer-box {
         flex: 0 0 100%;
+    }
+
+    body#page-question-type-coderunner-docs #topofscroll {
+      padding-left: 0;
+      padding-right: 0;
     }
 }
 /* end of Michal S changes */
