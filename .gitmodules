@@ -1,6 +1,6 @@
-[submodule "deps_original/moodle-qtype_coderunner"]
-	path = deps_original/moodle-qtype_coderunner
+[submodule "deps-original/moodle-qtype_coderunner"]
+	path = deps-original/moodle-qtype_coderunner
 	url = https://github.com/trampgeek/moodle-qtype_coderunner
-[submodule "deps_original/moodle-qbehaviour_adaptive_adapted_for_coderunner"]
-	path = deps_original/moodle-qbehaviour_adaptive_adapted_for_coderunner
+[submodule "deps-original/moodle-qbehaviour_adaptive_adapted_for_coderunner"]
+	path = deps-original/moodle-qbehaviour_adaptive_adapted_for_coderunner
 	url = https://github.com/trampgeek/moodle-qbehaviour_adaptive_adapted_for_coderunner
