@@ -1,0 +1,34 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      - webserver
+    ports:
+      - "0.0.0.0:${CADDY_PUBLIC_PORT:-22239}:80"
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile:ro"
+    networks:
+      - default
+  webserver:
+    volumes:
+      - "${ASSETDIR}/web/apache2_alias_new.conf:/etc/apache2/conf-enabled/moodle-alias-new.conf"
+
+  webserver-old:
+    image: "moodlehq/moodle-php-apache:${MOODLE_DOCKER_PHP_VERSION:-8.2}"
+    depends_on:
+      - db
+    volumes:
+      - "${CR_DEPEND_REPO_OLD}:/var/www/html/question/behaviour/adaptive_adapted_for_coderunner"
+      - "${CODERUNNER_REPO_OLD}:/var/www/html/question/type/coderunner"
+      - "${MOODLE_DOCKER_WWWROOT}:/var/www/html"
+      - "${ASSETDIR}/web/apache2_faildumps.conf:/etc/apache2/conf-enabled/moodle-faildump.conf"
+      - "${ASSETDIR}/web/apache2_alias_old.conf:/etc/apache2/conf-enabled/moodle-alias-old.conf"
+    environment:
+      MOODLE_DOCKER_RUNNING: 1
+      MOODLE_DOCKER_DBTYPE: "${MOODLE_DOCKER_DB}"
+      MOODLE_DOCKER_DBNAME: moodle
+      MOODLE_DOCKER_DBUSER: moodle
+      MOODLE_DOCKER_DBPASS: "m@0dl3ing"
+      MOODLE_DOCKER_BROWSER: firefox
+      MOODLE_DOCKER_PUBLIC_WWWROOT: "https://moodle.skraburski.com/old"
+      MOODLE_DOCKER_TIMEOUT_FACTOR: "${MOODLE_DOCKER_TIMEOUT_FACTOR:-1}"
