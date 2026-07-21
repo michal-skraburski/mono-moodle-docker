@@ -389,6 +389,45 @@ class behat_coderunner extends behat_base {
     }
 
     /**
+     * Reports whether any test-case code/expected field on the author form
+     * currently holds the given text. Kept index-agnostic (it scans the field
+     * values, not specific row numbers) because Moodle may renumber the
+     * surviving rows after a deletion.
+     * @param string $text the text to look for.
+     * @return bool true if some test-case field contains it.
+     */
+    protected function a_test_case_field_contains($text) {
+        $needle = json_encode((string) $text);
+        $js = <<<JS
+return Array.prototype.some.call(
+    document.querySelectorAll("textarea[name^='testcode['], textarea[name^='expected[']"),
+    function(t) { return t.value.indexOf($needle) !== -1; }
+);
+JS;
+        return (bool) $this->getSession()->evaluateScript($js);
+    }
+
+    /**
+     * @Then /^a CodeRunner test case should contain "(?P<text_string>(?:[^"]|\\")*)"$/
+     * @param string $text the text a surviving test case must still hold.
+     */
+    public function a_coderunner_test_case_should_contain($text) {
+        if (!$this->a_test_case_field_contains($text)) {
+            throw new ExpectationException("No test case field contains '$text'", $this->getSession());
+        }
+    }
+
+    /**
+     * @Then /^no CodeRunner test case should contain "(?P<text_string>(?:[^"]|\\")*)"$/
+     * @param string $text the text that must no longer appear in any test case.
+     */
+    public function no_coderunner_test_case_should_contain($text) {
+        if ($this->a_test_case_field_contains($text)) {
+            throw new ExpectationException("A test case field still contains '$text'", $this->getSession());
+        }
+    }
+
+    /**
      * Simulates a horizontal drag of the CodeRunner layout divider by the given
      * number of pixels. A real Selenium click-drag on a thin splitter is flaky,
      * and the divider handler only reads event.clientX, so synthetic mouse

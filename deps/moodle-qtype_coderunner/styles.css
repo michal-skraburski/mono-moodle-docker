@@ -572,7 +572,8 @@ body#page-question-type-coderunner input.testcasedelete {
   display:none;
 }
 
-.que.coderunner .formulation {
+/* Flex only in split mode; stacked keeps block flow so Ace/Scratchpad render as upstream. */
+.que.coderunner.layout-split .formulation {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;

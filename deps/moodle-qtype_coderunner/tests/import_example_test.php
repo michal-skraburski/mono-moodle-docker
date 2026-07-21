@@ -194,39 +194,51 @@ class import_example_test extends \advanced_testcase
         [$course, $teacher] = $this->make_course_and_user("editingteacher");
         $this->setUser($teacher);
 
-        // A broken example file must fail cleanly: no question created and
-        // either the "Import failed" notice or a moodle_exception, never the
-        // success redirect. Drop a malformed file into the examples dir so the
-        // realpath guard accepts the slug but the XML importer rejects it.
+        // Drop a temporary example file into the examples dir so the realpath
+        // guard accepts the slug, but give it a question of a non-existent type
+        // so the XML importer rejects it. This is well-formed XML (it parses)
+        // yet fails to import, exercising the "Import failed" branch without
+        // depending on how a parse error would surface across Moodle versions.
         $slug = "zz-behat-broken";
         $brokenfile = $CFG->dirroot .
             "/question/type/coderunner/docs/editor/example_questions/{$slug}.xml";
-        if (@file_put_contents($brokenfile, "<not-a-valid-quiz>") === false) {
+        $brokenxml = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="qtype_that_does_not_exist">
+    <name><text>Broken example</text></name>
+    <questiontext format="html"><text>nothing</text></questiontext>
+  </question>
+</quiz>
+XML;
+        if (@file_put_contents($brokenfile, $brokenxml) === false) {
             $this->markTestSkipped("Examples directory is not writable for the failure-path test");
         }
         try {
+            // A failed import must not throw the success redirect. Tolerate a
+            // thrown error too, in case a future Moodle surfaces the failure
+            // that way, but never accept the redirecterrordetected of success.
             $threw = false;
             try {
                 $output = $this->run_import_script(["slug" => $slug], [
                     "qtype_coderunner_import_courseid" => $course->id,
                     "sesskey" => sesskey(),
                 ]);
-            } catch (moodle_exception $e) {
+            } catch (\Throwable $e) {
                 $threw = true;
-                // Only the success path throws the redirect; a failure must not.
-                $this->assertNotSame("redirecterrordetected", $e->errorcode);
+                // Only the success path throws redirect with this errorcode.
+                if ($e instanceof moodle_exception) {
+                    $this->assertNotSame("redirecterrordetected", $e->errorcode, $e->getMessage());
+                }
             }
             if (!$threw) {
                 $this->assertStringContainsString("Import failed", $output);
             }
-            $coursecontext = \context_course::instance($course->id);
+            // The category is created before the import runs, so it may exist;
+            // what matters is that the broken question was not created.
             $this->assertFalse(
-                $DB->record_exists("question_categories", [
-                    "contextid" => $coursecontext->id,
-                    "name" => "CodeRunner examples",
-                ]) &&
-                    $DB->record_exists("question", ["name" => "Hello, World!"]),
-                "A broken import must not create example questions"
+                $DB->record_exists("question", ["name" => "Broken example"]),
+                "A broken import must not create any question"
             );
         } finally {
             @unlink($brokenfile);

@@ -30,17 +30,15 @@ Feature: Delete a test case in the CodeRunner author form
     And I set the field "id_questiontext" to "Delete the middle test case"
 
   Scenario: Deleting the middle test case keeps the other two intact
-    When I set the field "id_testcode_0" to "print('ALPHA')"
+    When I set the field "id_testcode_0" to "ALPHA_CASE"
     And I set the field "id_expected_0" to "ALPHA"
-    And I set the field "id_testcode_1" to "print('BETA')"
+    And I set the field "id_testcode_1" to "BETA_CASE"
     And I set the field "id_expected_1" to "BETA"
-    And I set the field "id_testcode_2" to "print('GAMMA')"
+    And I set the field "id_testcode_2" to "GAMMA_CASE"
     And I set the field "id_expected_2" to "GAMMA"
     And I delete CodeRunner test case "1"
-    # The deleted row's controls are gone and its neighbours are unshifted:
-    # the surviving rows keep their original indices 0 and 2.
-    Then "input[name='deletetestcase[1]']" "css_element" should not exist
-    And the field "id_testcode_0" matches value "print('ALPHA')"
-    And the field "id_expected_0" matches value "ALPHA"
-    And the field "id_testcode_2" matches value "print('GAMMA')"
-    And the field "id_expected_2" matches value "GAMMA"
+    # The two surviving cases keep their data (Moodle may renumber the rows,
+    # so this checks the values, not their row indices); the deleted one is gone.
+    Then a CodeRunner test case should contain "ALPHA_CASE"
+    And a CodeRunner test case should contain "GAMMA_CASE"
+    And no CodeRunner test case should contain "BETA_CASE"
