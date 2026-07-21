@@ -267,7 +267,10 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
             make_temp_directory('qtype_coderunner');
             $cookiefile = $CFG->tempdir . '/qtype_coderunner/session_cookies_' . $this->currentjobid . '.txt';
 
-            $curl = new curl();
+            // ignoresecurity: the Jobe server is a trusted, admin-configured
+            // internal host, so bypass Moodle's cURL SSRF blocklist (which
+            // otherwise blocks Docker-internal/private IPs).
+            $curl = new curl(['ignoresecurity' => true]);
             $curl->setopt([
                     'CURLOPT_COOKIEJAR' => $cookiefile,
                     'CURLOPT_COOKIEFILE' => $cookiefile,
@@ -501,7 +504,8 @@ class qtype_coderunner_jobesandbox extends qtype_coderunner_sandbox {
         [$url, $headers] = $this->get_jobe_connection_info($resource);
 
         if ($curl == null) {
-            $curl = new curl();
+            // ignoresecurity: trusted internal Jobe host — see note above.
+            $curl = new curl(['ignoresecurity' => true]);
         }
         $curl->setHeader($headers);
 
