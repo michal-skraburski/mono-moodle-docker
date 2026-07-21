@@ -7,6 +7,7 @@ services:
       - "0.0.0.0:${CADDY_PUBLIC_PORT:-22239}:80"
     volumes:
       - "./Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "./docs:/srv/docs:ro"
     networks:
       - default
   webserver:

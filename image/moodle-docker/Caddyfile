@@ -13,6 +13,19 @@
     }
   }
 
+  # The site root renders the Markdown docs. Caddy's `templates` directive
+  # runs _layout.html, which reads /srv/docs/index.md and renders it to HTML
+  # via the built-in `markdown` function. The docs dir is mounted read-only
+  # in local.yml.
+  @root path /
+  handle @root {
+    root * /srv/docs
+    templates
+    rewrite * /_layout.html
+    file_server
+  }
+
+  # Anything else 404s.
   handle {
     respond "Not found" 404
   }
