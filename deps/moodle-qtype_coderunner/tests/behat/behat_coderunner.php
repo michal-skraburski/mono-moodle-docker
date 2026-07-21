@@ -362,4 +362,60 @@ class behat_coderunner extends behat_base {
             $alert->accept();
         }
     }
+
+    /**
+     * Clicks the "Delete this test case" button on the given (zero-based) test
+     * case row of the question author form and accepts the confirmation dialog
+     * raised by authorform.js, so the form is re-displayed with that row gone.
+     *
+     * @When /^I delete CodeRunner test case "(?P<row_number>\d+)"$/
+     * @param string $row the zero-based repeat index of the test case to delete.
+     */
+    public function i_delete_coderunner_test_case($row) {
+        $session = $this->getSession();
+        $button = $session->getPage()->find('css', "input[name='deletetestcase[$row]']");
+        if (!$button) {
+            throw new ExpectationException("No delete button for test case $row", $session);
+        }
+        $button->click();
+        // Wait for the confirm() dialog the delete handler raises, then accept.
+        sleep(1);
+        try {
+            $alert = $session->getDriver()->getWebDriver()->switchTo()->alert();
+            $alert->accept();
+        } catch (NoSuchAlertException $ex) {
+            throw new ExpectationException("Expected a delete-confirmation dialog", $session);
+        }
+    }
+
+    /**
+     * Simulates a horizontal drag of the CodeRunner layout divider by the given
+     * number of pixels. A real Selenium click-drag on a thin splitter is flaky,
+     * and the divider handler only reads event.clientX, so synthetic mouse
+     * events reproduce the drag deterministically.
+     *
+     * @When /^I drag the CodeRunner divider by "(?P<pixels_number>-?\d+)" pixels$/
+     * @param string $pixels the horizontal distance to drag, negative for left.
+     */
+    public function i_drag_the_coderunner_divider($pixels) {
+        $delta = (int) $pixels;
+        $js = <<<JS
+(function() {
+    var divider = document.querySelector('.que.coderunner .formulation .divider');
+    if (!divider) {
+        return;
+    }
+    var rect = divider.getBoundingClientRect();
+    var startX = rect.left + rect.width / 2;
+    var y = rect.top + rect.height / 2;
+    function ev(type, x) {
+        return new MouseEvent(type, {bubbles: true, cancelable: true, view: window, clientX: x, clientY: y});
+    }
+    divider.dispatchEvent(ev('mousedown', startX));
+    document.dispatchEvent(ev('mousemove', startX + ($delta)));
+    document.dispatchEvent(ev('mouseup', startX + ($delta)));
+})();
+JS;
+        $this->getSession()->executeScript($js);
+    }
 }

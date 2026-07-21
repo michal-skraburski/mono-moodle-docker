@@ -46,3 +46,29 @@ Feature: Switch the layout of a CodeRunner question
     And I reload the page
     Then ".que.coderunner.layout-split" "css_element" should exist
     And ".coderunner-layout-btn[title='Side by side'].active" "css_element" should exist
+
+  Scenario: Collapse and restore the question info panel
+    When I am on the "Square function" "core_question > preview" page logged in as teacher1
+    Then ".info .info-toggle-btn" "css_element" should exist
+    And ".que.coderunner.info-collapsed" "css_element" should not exist
+    When I click on ".info .info-toggle-btn" "css_element"
+    Then ".que.coderunner.info-collapsed" "css_element" should exist
+    And ".info-toggle-btn[title='Show question info']" "css_element" should exist
+    When I click on ".info .info-toggle-btn" "css_element"
+    Then ".que.coderunner.info-collapsed" "css_element" should not exist
+    And ".info-toggle-btn[title='Hide question info']" "css_element" should exist
+
+  Scenario: The collapsed info panel is remembered when the page is reloaded
+    When I am on the "Square function" "core_question > preview" page logged in as teacher1
+    And I click on ".info .info-toggle-btn" "css_element"
+    And I reload the page
+    Then ".que.coderunner.info-collapsed" "css_element" should exist
+
+  Scenario: Dragging the divider resizes the question and answer boxes
+    When I am on the "Square function" "core_question > preview" page logged in as teacher1
+    And I click on ".coderunner-layout-btn[title='Side by side']" "css_element"
+    Then ".que.coderunner .formulation .divider" "css_element" should exist
+    # Switching to side-by-side clears any inline flex sizing, so a flex style
+    # appearing on the question box proves the drag handler resized it.
+    When I drag the CodeRunner divider by "80" pixels
+    Then ".que.coderunner .question_box[style*='flex']" "css_element" should exist

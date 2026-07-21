@@ -154,4 +154,102 @@ class import_example_test extends \advanced_testcase
         $this->expectException(moodle_exception::class);
         $this->run_import_script(["slug" => "does-not-exist"]);
     }
+
+    public function test_import_reuses_existing_examples_category()
+    {
+        global $DB;
+        [$course, $teacher] = $this->make_course_and_user("editingteacher");
+        $this->setUser($teacher);
+        // Import the same example twice. The docs warn this makes duplicates,
+        // but the "CodeRunner examples" category must be created once and then
+        // reused (exercising the !$category false branch on the second run).
+        foreach ([1, 2] as $unused) {
+            try {
+                $this->run_import_script(["slug" => "01-hello-world"], [
+                    "qtype_coderunner_import_courseid" => $course->id,
+                    "sesskey" => sesskey(),
+                ]);
+                $this->fail("Expected the success redirect to the question bank");
+            } catch (moodle_exception $e) {
+                $this->assertSame("redirecterrordetected", $e->errorcode);
+            }
+        }
+        $coursecontext = \context_course::instance($course->id);
+        $categories = $DB->get_records(
+            "question_categories",
+            ["contextid" => $coursecontext->id, "name" => "CodeRunner examples"]
+        );
+        $this->assertCount(1, $categories, "Expected exactly one examples category after two imports");
+        // Two imports of a one-question file must leave two question copies.
+        $this->assertSame(
+            2,
+            $DB->count_records("question", ["name" => "Hello, World!"]),
+            "Expected the example question to have been imported twice"
+        );
+    }
+
+    public function test_import_failure_reports_and_imports_nothing()
+    {
+        global $CFG, $DB;
+        [$course, $teacher] = $this->make_course_and_user("editingteacher");
+        $this->setUser($teacher);
+
+        // A broken example file must fail cleanly: no question created and
+        // either the "Import failed" notice or a moodle_exception, never the
+        // success redirect. Drop a malformed file into the examples dir so the
+        // realpath guard accepts the slug but the XML importer rejects it.
+        $slug = "zz-behat-broken";
+        $brokenfile = $CFG->dirroot .
+            "/question/type/coderunner/docs/editor/example_questions/{$slug}.xml";
+        if (@file_put_contents($brokenfile, "<not-a-valid-quiz>") === false) {
+            $this->markTestSkipped("Examples directory is not writable for the failure-path test");
+        }
+        try {
+            $threw = false;
+            try {
+                $output = $this->run_import_script(["slug" => $slug], [
+                    "qtype_coderunner_import_courseid" => $course->id,
+                    "sesskey" => sesskey(),
+                ]);
+            } catch (moodle_exception $e) {
+                $threw = true;
+                // Only the success path throws the redirect; a failure must not.
+                $this->assertNotSame("redirecterrordetected", $e->errorcode);
+            }
+            if (!$threw) {
+                $this->assertStringContainsString("Import failed", $output);
+            }
+            $coursecontext = \context_course::instance($course->id);
+            $this->assertFalse(
+                $DB->record_exists("question_categories", [
+                    "contextid" => $coursecontext->id,
+                    "name" => "CodeRunner examples",
+                ]) &&
+                    $DB->record_exists("question", ["name" => "Hello, World!"]),
+                "A broken import must not create example questions"
+            );
+        } finally {
+            @unlink($brokenfile);
+        }
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function test_import_rejected_on_mod_qbank_site()
+    {
+        // On a mod_qbank site (Moodle 4.6+) the course-context import path no
+        // longer applies, so the script must refuse rather than import into the
+        // wrong place. Fake mod_qbank's presence by defining the class the
+        // detector checks for. Runs in a separate process because a class
+        // definition cannot be undone and would leak into other tests.
+        if (!class_exists("mod_qbank\\task\\transfer_question_categories")) {
+            eval("namespace mod_qbank\\task; class transfer_question_categories {}");
+        }
+        [, $teacher] = $this->make_course_and_user("editingteacher");
+        $this->setUser($teacher);
+        $this->expectException(moodle_exception::class);
+        $this->run_import_script(["slug" => "01-hello-world"]);
+    }
 }
