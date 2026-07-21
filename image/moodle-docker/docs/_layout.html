@@ -1,5 +1,7 @@
-{{- $file := include "/index.md" -}}
-{{- $doc := splitFrontMatter $file -}}
+{{- $p := .OriginalReq.URL.Path -}}
+{{- $md := "/index.md" -}}
+{{- if ne $p "/" -}}{{- $md = print $p ".md" -}}{{- end -}}
+{{- $doc := splitFrontMatter (include $md) -}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

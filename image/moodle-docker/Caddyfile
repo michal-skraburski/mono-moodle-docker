@@ -1,4 +1,14 @@
+# Shared: render a Markdown page through _layout.html. The layout picks which
+# .md to load from the original request path ("/" -> index.md, "/x" -> x.md).
+(rendermd) {
+  templates
+  rewrite * /_layout.html
+  file_server
+}
+
 :80 {
+  root * /srv/docs
+
   @new path /new /new/*
   handle @new {
     reverse_proxy webserver:80 {
@@ -13,16 +23,22 @@
     }
   }
 
-  # The site root renders the Markdown docs. Caddy's `templates` directive
-  # runs _layout.html, which reads /srv/docs/index.md and renders it to HTML
-  # via the built-in `markdown` function. The docs dir is mounted read-only
-  # in local.yml.
-  @root path /
-  handle @root {
-    root * /srv/docs
-    templates
-    rewrite * /_layout.html
+  # Static assets (logo, images, css) served straight from /srv/docs.
+  @assets path *.svg *.jpg *.jpeg *.png *.ico *.gif *.webp *.css
+  handle @assets {
     file_server
+  }
+
+  # Site root renders index.md.
+  @home path /
+  handle @home {
+    import rendermd
+  }
+
+  # "/name" renders name.md, but only if that file exists (else falls through).
+  @page file {path}.md
+  handle @page {
+    import rendermd
   }
 
   # Anything else 404s.
