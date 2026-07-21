@@ -30,6 +30,9 @@ if (strpos($_SERVER['HTTP_HOST'], '.gitpod.io') !== false) {
     $CFG->sslproxy = true;
     // To avoid registration form.
     $CFG->site_is_public = false;
+}else if (!empty(getenv('MOODLE_DOCKER_PUBLIC_WWWROOT'))) {
+    $CFG->wwwroot = rtrim(getenv('MOODLE_DOCKER_PUBLIC_WWWROOT'), '/');
+    $CFG->sslproxy = true;
 } else {
     // Docker deployment.
     $host = 'localhost';
