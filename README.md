@@ -86,7 +86,7 @@ bin/moodle-docker-compose exec webserver \
   --adminpass=test --adminemail=admin@example.com
 ```
 
-`quick-start.sh` runs steps 1–3 for you (it uses `git://` and `MOODLE_DOCKER_WEB_HOST=192.168.100.2`;
+`quick-start.sh` runs steps 1–3 for you (it uses `git://` and `MOODLE_DOCKER_WEB_HOST=127.0.0.1`;
 edit it if either doesn't suit your setup).
 
 ### Access
