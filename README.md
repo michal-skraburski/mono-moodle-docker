@@ -5,6 +5,14 @@ A Docker-based Moodle environment for developing and testing an enhanced fork of
 plugin, its companion question behaviour, a containerised Moodle + Jobe sandbox, and the
 scripts to build, run and test the whole stack.
 
+## Website already deployed
+You can find a deployed website at [moodle.skraburski.com/new](https://moodle.skraburski.com/new).
+Documentation on how to use it can be found at [moodle.skraburski.com/index](https://moodle.skraburski.com/index).
+It is highly recommended to view the [documentation](https://moodle.skraburski.com/index)
+as it shows how to use the website and quickly access the features added.
+
+You will need login details, found on your email/invite or on the report for the project.
+
 ## What the fork adds
 
 On top of upstream [CodeRunner](https://github.com/trampgeek/moodle-qtype_coderunner):
