@@ -22,11 +22,14 @@ The two distinctions to make is that `new` and `old` reflect which version of th
 path is providing. `new` meaning everything up to latest and my changes. `old` meaning my
 changes only.
 
-This setup is useful to you (hopefully the marker) because you can alternate between the two
-sub paths and see what is different. Both servers share the database and Jobe server, except
-for the plugins which have separate volumes. This means you can just replace the `new` sub path
-with `old` and land on the exact same page, **you will however have to login twice** if you
-use this feature, once per session -- This is because the web servers cannot share session keys.
+This setup is useful to you because you can alternate between the two sub paths and see what is
+different. Both servers share the database and Jobe server, except for the plugins which have
+separate volumes. This means you can just replace the `new` sub path with `old` and land on the
+exact same page, **you will however have to login twice** if you use this feature, once per
+session -- This is because the web servers cannot share session keys.
+
+It is highly recommended to view the [What to explore](explore) page because it contains direct links
+to examples of the changes applied.
 
 ## See more
 
