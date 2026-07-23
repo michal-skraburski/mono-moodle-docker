@@ -49,7 +49,7 @@ class qbehaviour_adaptive_adapted_for_coderunner_renderer extends qbehaviour_ada
             $buttons .= $this->give_up_button($qa, $options);
         }
         $buttons .= $this->savedraft_button($qa, $options);
-        return html_writer::div($buttons, 'd-flex');
+        return html_writer::div($buttons, 'd-flex') . $this->savedraft_hint($qa, $options);
     }
 
     /**
@@ -71,6 +71,42 @@ class qbehaviour_adaptive_adapted_for_coderunner_renderer extends qbehaviour_ada
         if (!$options->readonly) {
             $this->page->requires->js_call_amd('core_question/question_engine', 'initSubmitButton', [$attributes['id']]);
         }
+        return $output;
+    }
+
+    /**
+     * A short live status line under the button set, telling the student their
+     * answer also auto-saves and showing when the next save is due. It is
+     * rendered empty and hidden; the AMD module only reveals it inside a real
+     * quiz attempt where Moodle's autosave runs, so nothing is claimed in
+     * preview or other non-autosaving contexts.
+     * @param question_attempt $qa the question attempt.
+     * @param question_display_options $options the display options.
+     * @return string the status-line HTML (empty when readonly).
+     */
+    protected function savedraft_hint(question_attempt $qa, question_display_options $options) {
+        if ($options->readonly) {
+            return '';
+        }
+        $buttonid = $qa->get_behaviour_field_name('savedraft');
+        $hintid = $buttonid . '_hint';
+        $inner = html_writer::tag('span', '', ['class' => 'cr-savedraft-label'])
+               . html_writer::tag('span', '', ['class' => 'cr-savedraft-count', 'aria-hidden' => 'true']);
+        $output = html_writer::div($inner, 'cr-savedraft-hint', [
+            'id' => $hintid,
+            'aria-live' => 'polite',
+            'hidden' => 'hidden',
+        ]);
+        $component = 'qbehaviour_adaptive_adapted_for_coderunner';
+        $strings = [
+            'idle' => get_string('savedraftidle', $component),
+            'dirty' => get_string('savedraftdirty', $component),
+            'saving' => get_string('savedraftsaving', $component),
+            'saved' => get_string('savedraftsaved', $component),
+            'countdown' => get_string('savedraftcountdown', $component),
+        ];
+        $this->page->requires->js_call_amd('qtype_coderunner/savedrafthint', 'init',
+                [$hintid, $buttonid, $strings]);
         return $output;
     }
 
