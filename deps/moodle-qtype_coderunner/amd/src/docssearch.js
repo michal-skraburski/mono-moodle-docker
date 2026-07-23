@@ -261,15 +261,18 @@ define([], function() {
         }
       } else {
         resultsEl.innerHTML = current.map(function(entry, i) {
-          // Breadcrumb: the source file, then the enclosing headings, so a
-          // sub-subheading result is shown grouped under its parents.
-          var crumbs = [entry.page].concat(entry.context || []);
-          var breadcrumb = crumbs.map(escapeHtml)
-            .join(' <span class="docs-search-crumb-sep">›</span> ');
+          // Path source: the heading trail from the page's top heading down to
+          // the subheading this match sits in (the emphasised last segment),
+          // e.g. "Example Walkthroughs › Hello, World! › ... question type panel".
+          var path = (entry.context || []).concat([entry.heading]);
+          var last = path.length - 1;
+          var pathHtml = path.map(function(seg, j) {
+            var cls = j === last ? 'docs-search-path-match' : 'docs-search-path-seg';
+            return '<span class="' + cls + '">' + escapeHtml(seg) + '</span>';
+          }).join('<span class="docs-search-crumb-sep">›</span>');
           return '<a class="docs-search-result" role="option" id="docs-search-opt-' + i + '" href="'
             + escapeHtml(linkFor(entry)) + '">'
-            + '<span class="docs-search-breadcrumb">' + breadcrumb + '</span>'
-            + '<span class="docs-search-heading">' + escapeHtml(entry.heading) + '</span>'
+            + '<span class="docs-search-path">' + pathHtml + '</span>'
             + '<span class="docs-search-snippet">' + snippet(entry.text, terms) + '</span>'
             + '</a>';
         }).join('');

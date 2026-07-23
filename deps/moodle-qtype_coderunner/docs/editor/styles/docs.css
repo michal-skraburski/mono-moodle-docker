@@ -213,19 +213,22 @@
 #page-question-type-coderunner-docs .docs-search-result.selected {
   background: #eef4fb;
 }
-#page-question-type-coderunner-docs .docs-search-breadcrumb {
+#page-question-type-coderunner-docs .docs-search-path {
   display: block;
-  margin-bottom: 0.15rem;
-  font-size: 0.72rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+#page-question-type-coderunner-docs .docs-search-path-seg {
   color: #888;
 }
-#page-question-type-coderunner-docs .docs-search-crumb-sep {
-  color: #bbb;
-}
-#page-question-type-coderunner-docs .docs-search-heading {
-  display: block;
+#page-question-type-coderunner-docs .docs-search-path-match {
   font-weight: 600;
   color: #0f6cbf;
+}
+#page-question-type-coderunner-docs .docs-search-crumb-sep {
+  margin: 0 0.35rem;
+  color: #bbb;
 }
 #page-question-type-coderunner-docs .docs-search-snippet {
   display: block;
