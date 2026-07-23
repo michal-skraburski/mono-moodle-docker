@@ -138,7 +138,7 @@ function qtype_coderunner_docs_wrap_sections($html) {
             continue;
         }
         if (preg_match('/^<h[1-6][^>]*\bid="([^"]*)"/i', $section, $m)) {
-            $out .= '<div class="doc-section" data-anchor="' . s($m[1]) . '">' . $section . '</div>';
+            $out .= '<div class="doc-section" id="'. s($m[1]) . '-div" data-anchor="' . s($m[1]) . '">' . $section . '</div>';
         } else if (preg_match('/^<h[1-6][\s>]/i', $section)) {
             $out .= '<div class="doc-section">' . $section . '</div>';
         } else {

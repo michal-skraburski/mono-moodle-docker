@@ -20,9 +20,9 @@ The editor is organised into panels that roughly follow the lifecycle of a submi
 For a deep-dive into how templates work, Twig variables, and template graders, see [Templating](docs.php?page=templating.md).
 
 ### More documentation
-- [Templating](docs.php?page=templating.md) — Twig variables, per-test and combinator templates, template parameters, randomisation, and template graders.
-- [Walkthrough questions](docs.php?page=example_walkthroughs.md) - example questions walkthrough for by example education
 - [Example questions](docs.php?page=example_questions.md) — downloadable question exports you can import into your question bank and experiment with.
+- [Walkthrough questions](docs.php?page=example_walkthroughs.md) - example questions walkthrough for by example education
+- [Templating](docs.php?page=templating.md) — Twig variables, per-test and combinator templates, template parameters, randomisation, and template graders.
 - [Official CodeRunner Website](https://coderunner.org.nz) - Introductory usage including how quizzes look and are used
 - [Deep-dive documentation](https://trampgeek.github.io/moodle-qtype_coderunner/) - official documentation discussing usage and installation
 - [Author forum](https://coderunner.org.nz/mod/forum/view.php?id=51) - CodeRunner Author Forum for help and inquiries
