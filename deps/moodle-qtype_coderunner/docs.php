@@ -73,14 +73,22 @@ $PAGE->requires->js_call_amd('qtype_coderunner/docssearch', 'init', [
 ]);
 
 echo $OUTPUT->header();
-echo '<div id="coderunner-docs-search" class="docs-search">'
-    . '<div class="docs-search-field">'
-    . '<input type="search" class="docs-search-input" autocomplete="off" spellcheck="false"'
-    . ' placeholder="Search the docs" aria-label="Search the documentation" role="combobox"'
-    . ' aria-expanded="false" aria-controls="docs-search-results" aria-autocomplete="list">'
+
+// Documentation search: a bar docked at the top of the page that opens into a
+// centered modal palette (click it or press Ctrl+K); see amd/src/docssearch.js.
+echo '<button type="button" id="coderunner-docs-search-trigger" class="docs-search-trigger"'
+    . ' aria-label="Search the documentation">'
+    . '<span class="docs-search-trigger-label">Search the docs…</span>'
     . '<kbd class="docs-search-kbd">Ctrl K</kbd>'
-    . '</div>'
+    . '</button>';
+echo '<div id="coderunner-docs-search" class="docs-search" role="dialog" aria-modal="true"'
+    . ' aria-label="Search the documentation" aria-hidden="true">'
+    . '<div class="docs-search-panel">'
+    . '<input type="search" class="docs-search-input" autocomplete="off" spellcheck="false"'
+    . ' placeholder="Search the docs…" aria-label="Search the documentation" role="combobox"'
+    . ' aria-expanded="false" aria-controls="docs-search-results" aria-autocomplete="list">'
     . '<div id="docs-search-results" class="docs-search-results" role="listbox" aria-label="Search results"></div>'
+    . '</div>'
     . '<div class="docs-search-status" aria-live="polite"></div>'
     . '</div>';
 

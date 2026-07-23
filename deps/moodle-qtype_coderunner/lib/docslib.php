@@ -149,9 +149,12 @@ function qtype_coderunner_docs_wrap_sections($html) {
 }
 
 /**
- * Build the client-side search index: one entry per documentation section,
- * as {page, anchor, heading, text}. Uses the same transform + split as the
- * rendered pages so the anchors match exactly.
+ * Build the client-side search index: one entry per documentation section, as
+ * {page, anchor, heading, context, text}. Each entry keeps its own heading and
+ * anchor (so results jump to the exact subsection), plus `context`: the chain
+ * of enclosing shallower headings, outermost first, so a sub-subheading can be
+ * shown grouped under its parent heading(s) and page. Uses the same transform +
+ * split as the rendered pages so the anchors match exactly.
  * @param string $docsdir
  * @param string[] $pages page slugs (without .md).
  * @return array
@@ -164,15 +167,37 @@ function qtype_coderunner_docs_search_index($docsdir, $pages) {
             continue;
         }
         $html = qtype_coderunner_docs_transform(qtype_coderunner_docs_markdown(), file_get_contents($pagefile));
+        // Track the currently-open headings by level so each entry can carry
+        // the breadcrumb of its shallower ancestors.
+        $stack = [];
         foreach (preg_split('/(?=<h[1-6][\s>])/i', $html) as $section) {
-            if ($section === '' || !preg_match('/^<h[1-6][^>]*\bid="([^"]*)"/i', $section, $m)) {
+            if ($section === '' || !preg_match('/^<h([1-6])[^>]*\bid="([^"]*)"/i', $section, $m)) {
                 continue;
             }
+            $level = (int) $m[1];
             preg_match('/^<h[1-6][^>]*>(.*?)<\/h[1-6]>/is', $section, $hm);
+            $heading = trim(html_entity_decode(strip_tags($hm[1] ?? '')));
+            // Ancestors are the open headings shallower than this one (the
+            // stack is kept sorted by level, so this is outermost first).
+            $context = [];
+            foreach ($stack as $openlevel => $openheading) {
+                if ($openlevel < $level) {
+                    $context[] = $openheading;
+                }
+            }
+            // This heading closes any open heading at its own level or deeper.
+            foreach (array_keys($stack) as $openlevel) {
+                if ($openlevel >= $level) {
+                    unset($stack[$openlevel]);
+                }
+            }
+            $stack[$level] = $heading;
+            ksort($stack);
             $index[] = [
                 'page' => $pageslug . '.md',
-                'anchor' => $m[1],
-                'heading' => trim(html_entity_decode(strip_tags($hm[1] ?? ''))),
+                'anchor' => $m[2],
+                'heading' => $heading,
+                'context' => $context,
                 'text' => trim(preg_replace('/\s+/', ' ', html_entity_decode(strip_tags($section)))),
             ];
         }

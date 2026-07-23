@@ -322,8 +322,7 @@ JS;
         if ($q->showsource) {
             $fb .= $this->make_source_code_div($outcome);
         }
-        // aria-live has no effect, but it's here until I do figure something out
-        $fb .= html_writer::start_tag('div', ['class' => $resultsclass, 'aria-live' => 'polite']);
+        $fb .= html_writer::start_tag('div', ['class' => $resultsclass]);
     
         if ($outcome->invalid()) {
             $fb .= html_writer::tag(

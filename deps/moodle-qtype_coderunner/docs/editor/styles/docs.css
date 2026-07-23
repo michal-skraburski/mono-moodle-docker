@@ -111,4 +111,145 @@
   }
 }
 
+/* Documentation search.
+   Two states: a bar docked at the top of the page (the trigger), and, once
+   activated (click or Ctrl+K), a centered modal "command palette" over a
+   dimmed backdrop. Choosing a result closes the palette. */
+
+/* Docked trigger: styled like a search field, sits at the top of the page. */
+#page-question-type-coderunner-docs .docs-search-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 640px;
+  margin: 1rem auto 1.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  background: #fff;
+  color: #666;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: text;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+#page-question-type-coderunner-docs .docs-search-trigger:hover {
+  border-color: #0f6cbf;
+}
+#page-question-type-coderunner-docs .docs-search-trigger-label {
+  flex: 1;
+}
+
+/* Keyboard-hint pill shown inside the trigger. */
+#page-question-type-coderunner-docs .docs-search-kbd {
+  flex: none;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f5f5;
+  color: #666;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* Overlay: fixed, covers the viewport, dims the page, centers the panel. */
+#page-question-type-coderunner-docs .docs-search {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+#page-question-type-coderunner-docs .docs-search.open {
+  display: flex;
+}
+
+/* Palette panel: the white box in the middle of the screen. */
+#page-question-type-coderunner-docs .docs-search-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(640px, 100%);
+  max-height: 70vh;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+}
+#page-question-type-coderunner-docs .docs-search-input {
+  flex: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem 1.1rem;
+  border: none;
+  border-bottom: 1px solid #eee;
+  border-radius: 0;
+  font-size: 1.15rem;
+  color: #222;
+}
+#page-question-type-coderunner-docs .docs-search-input:focus {
+  outline: none;
+}
+#page-question-type-coderunner-docs .docs-search-results {
+  overflow-y: auto;
+}
+#page-question-type-coderunner-docs .docs-search-result {
+  display: block;
+  padding: 0.6rem 1.1rem;
+  border-bottom: 1px solid #f0f0f0;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+#page-question-type-coderunner-docs .docs-search-result:last-child {
+  border-bottom: none;
+}
+#page-question-type-coderunner-docs .docs-search-result:hover,
+#page-question-type-coderunner-docs .docs-search-result.selected {
+  background: #eef4fb;
+}
+#page-question-type-coderunner-docs .docs-search-breadcrumb {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.72rem;
+  color: #888;
+}
+#page-question-type-coderunner-docs .docs-search-crumb-sep {
+  color: #bbb;
+}
+#page-question-type-coderunner-docs .docs-search-heading {
+  display: block;
+  font-weight: 600;
+  color: #0f6cbf;
+}
+#page-question-type-coderunner-docs .docs-search-snippet {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+#page-question-type-coderunner-docs .docs-search-snippet mark {
+  background: #fff2a8;
+  padding: 0;
+}
+#page-question-type-coderunner-docs .docs-search-empty {
+  padding: 0.8rem 1.1rem;
+  color: #888;
+}
+
+/* Visually-hidden live region announcing result counts to screen readers. */
+#page-question-type-coderunner-docs .docs-search-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 

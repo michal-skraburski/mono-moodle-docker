@@ -31,7 +31,7 @@ The student is asked to write a complete C program that prints
 control is at its default, so it doubles as a reference for what the form
 looks like when the built-in question type does all the work.
 
-### CodeRunner question type panel
+### Hello, World! — CodeRunner question type panel
 
 | Field | Value | Effect in this question |
 |---|---|---|
@@ -52,7 +52,7 @@ looks like when the built-in question type does all the work.
 | Preprocessor | `None` | The empty Template parameters field is taken literally. |
 | UI parameters | empty | The Ace editor runs with default settings. |
 
-### General section
+### Hello, World! — General section
 
 | Field | Value |
 |---|---|
@@ -60,7 +60,7 @@ looks like when the built-in question type does all the work.
 | Question text | "Exercise 1: Hello World!" — write a C program printing `Hi, universe!`, with the compile commands students would use offline. |
 | Default mark | `1` |
 
-### Answer section
+### Hello, World! — Answer section
 
 | Field | Value | Effect |
 |---|---|---|
@@ -69,7 +69,7 @@ looks like when the built-in question type does all the work.
 | Answer preload | empty | The student's answer box starts blank. |
 | Global extra | empty | Not used. |
 
-### Test cases
+### Hello, World! — Test cases
 
 One test case:
 
@@ -85,7 +85,7 @@ One test case:
 | Mark | `1.0` | Irrelevant under all-or-nothing. |
 | Test type | `Normal` | Runs on Check (there is no Precheck anyway). |
 
-### Support files, attachments, advanced customisation
+### Hello, World! — Support files, attachments, advanced customisation
 
 No support files. Attachments `No` (required `0`, max size `10240`).
 Not a prototype; sandbox, CPU time, memory limit, language and Ace language
@@ -102,7 +102,7 @@ reversed, or `Invalid input!` for bad input. Two things differ from
 Hello, World!: the grader is overridden, and every test drives the program
 through **Standard input**.
 
-### CodeRunner question type panel
+### Reverse the Digits — CodeRunner question type panel
 
 Identical to Hello, World! except:
 
@@ -127,7 +127,7 @@ An exact-match grader would force students to reproduce that spacing
 byte-for-byte; the regex match is tolerant of surrounding whitespace and
 newlines.
 
-### General section
+### Reverse the Digits — General section
 
 | Field | Value |
 |---|---|
@@ -135,14 +135,14 @@ newlines.
 | Question text | "Exercise 4: Reverse the Digits" — prompt for a two-digit positive integer, print it reversed; invalid input must produce `Invalid input!`. |
 | Default mark | `1` |
 
-### Answer section
+### Reverse the Digits — Answer section
 
 Sample answer: a full C program using `scanf("%d", ...)`, validating
 `0 < input < 100`, and printing either the reversal (via `/10` and `%10`)
 or `Invalid input!`. **Validate on save** is checked, so this answer must
 pass all eight tests on every save. Answer preload and Global extra empty.
 
-### Test cases
+### Reverse the Digits — Test cases
 
 All eight tests share: *Use as example* unchecked, *Display* `SHOW`,
 **Hide rest if fail checked**, *Mark* `1.0`, *Test type* `Normal`.
@@ -167,7 +167,7 @@ is never compiled, so the author uses it as a visible label for each row:
 Note the deliberate edge cases: `10` (leading zero in the reversal, `01`),
 `99` (palindrome), and three invalid-input categories.
 
-### Support files, attachments, advanced customisation
+### Reverse the Digits — Support files, attachments, advanced customisation
 
 All empty/default, as in Hello, World!.
 
@@ -181,7 +181,7 @@ The student writes `void print_array(int *ptr, int len)` — a function, not a
 program — so this question uses the `c_function` type with a **customised
 template**, and awards **part marks** across behaviour and style tests.
 
-### CodeRunner question type panel
+### Print Array — CodeRunner question type panel
 
 | Field | Value | Effect in this question |
 |---|---|---|
@@ -198,7 +198,7 @@ template**, and awards **part marks** across behaviour and style tests.
 | Extract code from JSON | checked | Default, inert with Ace. |
 | **Twig all** | **checked** | Every question field (question text, test cases, …) is passed through Twig at question initialisation. Nothing here uses Twig variables, so it is inert — but note it is safe even though the C test code is full of braces: Twig only reacts to `{{`, `{%` and `{#`, never to `{1, 2, 3}`. |
 
-### Customisation panel
+### Print Array — Customisation panel
 
 **Template** (customised):
 
@@ -253,7 +253,7 @@ Line by line:
 **Grader**: blank — inherits **EqualityGrader**. **Result columns**: blank —
 default columns. **Student answer UI**: blank — Ace.
 
-### General section
+### Print Array — General section
 
 | Field | Value |
 |---|---|
@@ -261,7 +261,7 @@ default columns. **Student answer UI**: blank — Ace.
 | Question text | Write `void print_array(int *ptr, int len)` printing the elements comma-separated; students are told not to use square brackets. |
 | Default mark | `2` |
 
-### Answer section
+### Print Array — Answer section
 
 Sample answer (validated on save):
 
@@ -276,7 +276,7 @@ void print_array(int* ptr, int len){
 Note the sample answer itself avoids `[]` — it must, or it would fail test 2
 below and block the save. Answer preload and Global extra empty.
 
-### Test cases
+### Print Array — Test cases
 
 All tests: *Use as example* unchecked, *Display* `SHOW`, *Test type* `Normal`.
 
@@ -314,7 +314,7 @@ It prints the expected string only when the student used pointer arithmetic
 rather than array indexing. (Test 3's `arr[50]` declaration lives in the
 *test case*, not the student's answer — only `input` is searched.)
 
-### Support files, attachments, advanced customisation
+### Print Array — Support files, attachments, advanced customisation
 
 All empty/default; everything else inherited from `c_function`.
 
@@ -330,14 +330,14 @@ without `string.h`. The configuration is almost identical to Print Array —
 only the differences are listed here; every field not mentioned has the same
 value and effect as in [Print Array](#print-array-inspecting-the-students-source).
 
-### Differences in the question type panel
+### String Reverse — Differences in the question type panel
 
 | Field | Value | Effect |
 |---|---|---|
 | **All-or-nothing grading** | **checked** | Unlike Print Array: despite the per-test marks (0.5 / 0.5 / 1 / 2), a student must pass *every* test — including the constraint tests — to score at all. The marks only affect the reported breakdown. |
 | Default mark | `2` | |
 
-### Customisation panel — template
+### String Reverse — Customisation panel template
 
 Same structure as Print Array (same includes, `SEPARATOR`, `input` string
 via `e('c')`, combinator loop), with one addition — a helper defined
@@ -355,13 +355,13 @@ Any test case can call `str_len()` without depending on the student having
 written a correct length function — the template is the place to put
 utility code that test cases need.
 
-### Answer section
+### String Reverse — Answer section
 
 Sample answer: an in-place XOR-swap reversal using only pointers — it must
 avoid arrays *and* `string.h` to survive its own constraint tests under
 validate-on-save.
 
-### Test cases
+### String Reverse — Test cases
 
 | # | Test code | Expected | Mark | Display | Hide rest if fail |
 |---|---|---|---|---|---|
@@ -398,7 +398,7 @@ header/implementation pair). Each question tests **one file** of the
 project; the rest is supplied as support files. The striking choice: the
 question type is **python3** even though the student writes C.
 
-### CodeRunner question type panel (both questions)
+### Employee — CodeRunner question type panel (both questions)
 
 | Field | Value | Effect in this question |
 |---|---|---|
@@ -409,7 +409,7 @@ question type is **python3** even though the student writes C.
 | Twig all | unchecked | No Twig expansion of question fields. |
 | All remaining panel fields | defaults | As in Hello, World!. |
 
-### Customisation panel — template
+### Employee — Customisation panel template
 
 The `employee.c` question's template (the `employee.h` one is identical
 except it writes `employee.h`):
@@ -468,21 +468,21 @@ Step by step:
 **Grader / Result columns / UI**: blank — EqualityGrader, default columns,
 Ace.
 
-### General section
+### Employee — General section
 
 | Field | `Employee.h` question | `Employee.c` question |
 |---|---|---|
 | Question text | "Please enter the complete code for your employee.h file" | "Please enter the complete code for your employee.c file" |
 | Default mark | `2` | `2` |
 
-### Answer section
+### Employee — Answer section
 
 Each question's sample answer is the complete correct file (the header with
 the `EMPLOYEE` struct, `typedef` and five prototypes; the implementation
 with `malloc`-based array creation, input, printing, and highest-paid
 search). **Validate on save** checked on both.
 
-### Test cases
+### Employee — Test cases
 
 Both questions run the same driver; the test's *Test code* is again used as
 a row label, and *Standard input* feeds the driver's prompts
@@ -501,7 +501,7 @@ The expected outputs are the driver's **exact** full transcript (prompts,
 EqualityGrader — meaning the student's file must make the *whole program*
 behave, not just one function.
 
-### Support files
+### Employee — Support files
 
 The key to the multi-file setup — each question ships the *other half* plus
 the driver (see [Support files](docs.php?page=index.md#support-files)):
@@ -514,7 +514,7 @@ the driver (see [Support files](docs.php?page=index.md#support-files)):
 Support files are copied into the sandbox working directory before the run,
 which is why the template's `gcc` line finds them by bare filename.
 
-### Advanced customisation
+### Employee — Advanced customisation
 
 | Field | Value | Effect |
 |---|---|---|
