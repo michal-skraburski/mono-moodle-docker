@@ -363,30 +363,6 @@ class behat_coderunner extends behat_base {
         }
     }
 
-    /**
-     * Clicks the "Delete this test case" button on the given (zero-based) test
-     * case row of the question author form and accepts the confirmation dialog
-     * raised by authorform.js, so the form is re-displayed with that row gone.
-     *
-     * @When /^I delete CodeRunner test case "(?P<row_number>\d+)"$/
-     * @param string $row the zero-based repeat index of the test case to delete.
-     */
-    public function i_delete_coderunner_test_case($row) {
-        $session = $this->getSession();
-        $button = $session->getPage()->find('css', "input[name='deletetestcase[$row]']");
-        if (!$button) {
-            throw new ExpectationException("No delete button for test case $row", $session);
-        }
-        $button->click();
-        // Wait for the confirm() dialog the delete handler raises, then accept.
-        sleep(1);
-        try {
-            $alert = $session->getDriver()->getWebDriver()->switchTo()->alert();
-            $alert->accept();
-        } catch (NoSuchAlertException $ex) {
-            throw new ExpectationException("Expected a delete-confirmation dialog", $session);
-        }
-    }
 
     /**
      * Reports whether any test-case code/expected field on the author form
@@ -405,26 +381,6 @@ return Array.prototype.some.call(
 );
 JS;
         return (bool) $this->getSession()->evaluateScript($js);
-    }
-
-    /**
-     * @Then /^a CodeRunner test case should contain "(?P<text_string>(?:[^"]|\\")*)"$/
-     * @param string $text the text a surviving test case must still hold.
-     */
-    public function a_coderunner_test_case_should_contain($text) {
-        if (!$this->a_test_case_field_contains($text)) {
-            throw new ExpectationException("No test case field contains '$text'", $this->getSession());
-        }
-    }
-
-    /**
-     * @Then /^no CodeRunner test case should contain "(?P<text_string>(?:[^"]|\\")*)"$/
-     * @param string $text the text that must no longer appear in any test case.
-     */
-    public function no_coderunner_test_case_should_contain($text) {
-        if ($this->a_test_case_field_contains($text)) {
-            throw new ExpectationException("A test case field still contains '$text'", $this->getSession());
-        }
     }
 
     /**

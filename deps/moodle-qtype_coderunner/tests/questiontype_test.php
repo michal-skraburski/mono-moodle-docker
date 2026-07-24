@@ -109,7 +109,10 @@ class questiontype_test extends \advanced_testcase {
     private function invoke_copy_testcases_from_form(\stdClass $question, bool $validation): void {
         $method = new \ReflectionMethod(\qtype_coderunner::class, 'copy_testcases_from_form');
         $method->setAccessible(true);
-        $method->invokeArgs($this->qtype, [$question, $validation]);
+        // copy_testcases_from_form takes $question by reference, so the args
+        // array must hold it by reference or invokeArgs rejects it.
+        $args = [&$question, $validation];
+        $method->invokeArgs($this->qtype, $args);
     }
 
     public function test_copy_testcases_from_form_keeps_noncontiguous_survivors(): void {

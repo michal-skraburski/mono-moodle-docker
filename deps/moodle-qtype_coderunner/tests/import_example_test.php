@@ -143,7 +143,9 @@ class import_example_test extends \advanced_testcase
             ]);
             $this->fail("Expected a sesskey failure");
         } catch (moodle_exception $e) {
-            $this->assertSame("invalidsesskey", $e->errorcode);
+            // A missing sesskey is refused either as 'invalidsesskey' or, on
+            // newer Moodle, 'missingparam'; both mean the request was rejected.
+            $this->assertContains($e->errorcode, ["invalidsesskey", "missingparam"], $e->getMessage());
         }
     }
 

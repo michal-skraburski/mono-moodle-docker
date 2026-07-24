@@ -68,7 +68,7 @@ define([], function () {
           collapsedInfoQuestions.delete(questionId);
         }
         applyPageExpand(collapsedInfoQuestions.size > 0);
-        infoToggleBtn.innerHTML = collapsed ? '&#8250;' : '&#8249;';
+        infoToggleBtn.innerHTML = collapsed ? 'Show' : 'Hide';
         infoToggleBtn.title = collapsed ? 'Show question info' : 'Hide question info';
         infoToggleBtn.ariaLabel = infoToggleBtn.title;
         saveQuestionState(storageKey, { infoCollapsed: collapsed });
