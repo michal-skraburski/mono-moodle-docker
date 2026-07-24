@@ -703,14 +703,3 @@ body#page-question-type-coderunner div[id^=fitem_id_extra_] {
 }
 
 /* stylelint-enable declaration-no-important  */
-
-/* Save-draft auto-save hint (populated by qtype_coderunner/savedrafthint). */
-.cr-savedraft-hint {
-    margin-top: 0.35rem;
-    font-size: 0.85rem;
-    color: #6c757d;
-}
-
-.cr-savedraft-count {
-    font-variant-numeric: tabular-nums;
-}
