@@ -1,7 +1,11 @@
 
 \begin{abstract}
 
-It should not exceed one page. Mention the scope and objectives  of the project, the methodology used,the  main findings, and significance of your results.
+CodeRunner, the Moodle question type used to set and automatically grade programming exercises at the University of Strathclyde and elsewhere, is a mature and capable tool whose remaining weaknesses are problems of experience rather than of capability. Authoring a question means working through a dense editing form with fixed test-case batches, help text that vanishes on a click and misaligned controls, while its documentation is a single feature-organised page; students answer through a fixed layout with hidden feedback and little room to work. This project treated those frictions as an engineering problem and set out to remove them without disturbing what already worked.
+
+The work proceeded from evidence to delivery. CodeRunner and its two audiences were analysed through heuristic review, interviews and a survey of students and teachers; the faults found were turned into prioritised requirements; and the improvements were built inside a fully reproducible Docker development environment that recreates the whole system with a single command. The delivered changes span both sides of the tool: flexible test-case management and a corrected Precheck display for authors, a switchable and resizable layout and reclaimable space for students, measurable accessibility gains, and task-focused documentation, with in-plugin search, served from within the plugin and reachable from the editing form.
+
+The changes were verified by twenty-seven unit tests and the plugin's own browser-driven regression suite, all of which pass, and their value was confirmed by the survey: every delivered feature won majority approval from both students and teachers, no feature was rejected, and the accessibility audit rose from 93\% to 97\%. The significance of the result is methodological as much as practical: it demonstrates that a widely deployed educational tool can be improved meaningfully by disciplined user-experience engineering on the existing system, rather than by building a replacement.
 
 \end{abstract}
 
