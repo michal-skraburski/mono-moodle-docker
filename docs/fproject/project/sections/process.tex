@@ -19,11 +19,10 @@ It is first necessary to understand CodeRunner, its operation, and its integrati
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{figs/dependency_graph.png}
+    \includegraphics[width=0.8\textwidth]{figs/dependency_graph.png}
     \caption{Moodle \& Plugin dependency graph}
     \label{fig:dependency_graph}
 \end{figure}
-\pagebreak
 
 \subsubsection{Environment Setup}
 After figuring out the project, the work turned to Docker: software that packages a program together with everything it needs into isolated `containers', so that the same setup runs identically on any machine~\cite{dockerjournal}. Due to a lack of knowledge, Docker had to be learned for the first time; however this allowed a much faster setup and an automatically repeatable environment.
@@ -53,7 +52,7 @@ The author page (Figure~\ref{fig:authorpage_1}) is rough around the edges, and t
 \begin{figure}[H]
     \centering
     \setlength{\fboxsep}{0pt}%
-    \fbox{\includegraphics[height=0.72\textheight]{figs/authorpage_helpoverflow.jpg}}
+    \fbox{\includegraphics[height=0.55\textheight]{figs/authorpage_helpoverflow.jpg}}
     \caption{Author page showing the almost overflowing help hint discussed.}
     \label{fig:authorpage_helpoverflow}
 \end{figure}
@@ -160,7 +159,7 @@ The layout switcher found on the student-facing page is designed with a toggle t
     \setlength{\fboxsep}{0pt}%
     \begin{subfigure}{\linewidth}
         \centering
-        \fbox{\includegraphics[width=0.85\linewidth]{figs/studentanswer_1.jpg}}
+        \fbox{\includegraphics[width=0.72\linewidth]{figs/studentanswer_1.jpg}}
         \caption{Side-by-side view}
         \label{fig:studentanswer_sidebyside}
     \end{subfigure}
@@ -168,7 +167,7 @@ The layout switcher found on the student-facing page is designed with a toggle t
     \vspace{1em}
     \begin{subfigure}{\linewidth}
         \centering
-        \fbox{\includegraphics[width=0.70\linewidth]{figs/studentanswer_2.jpg}}
+        \fbox{\includegraphics[width=0.6\linewidth]{figs/studentanswer_2.jpg}}
         \caption{Stacked view}
         \label{fig:studentanswer_stacked}
     \end{subfigure}
@@ -205,15 +204,13 @@ The info panel on the student-facing page was slightly reworked by the addition 
 
 The documentation page added by this project required almost zero interface design because of how the system is designed: the input for this page is entirely Markdown (MD), which lets the PHP MD parser take care of the element and CSS styling. The output is then rendered as HTML onto the page. The input is also a part of the interface because it is written in Markdown, which makes writing up-to-date documentation far more accessible and readable. To quote a survey response: `Currently the best way to learn CodeRunner is to have someone that knows it explain it to you.' Making the documentation accessible and easy to update means that it has the potential to be extended in the future by other contributors and CodeRunner question authors who are experts in it.
 
-\pagebreak
-
 \subsubsection{System Design}
 
 The following diagram describes the Docker topology designed for the development part of this project:
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{figs/docker_project.png}
+    \includegraphics[width=0.8\textwidth]{figs/docker_project.png}
     \caption{Docker architecture}
     \label{fig:docker_project}
 \end{figure}

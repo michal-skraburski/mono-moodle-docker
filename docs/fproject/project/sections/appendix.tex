@@ -142,28 +142,15 @@ For acceptance testing the unmodified upstream Behat suite is executed against t
 
 \subsection{Appendix C: User Guide}
 
-This guide describes how to run the system and how to use the features the project delivers. It is organised by audience: first running the system, then the two roles the changes serve, question authors and students, and finally maintenance.
-
-\subsubsection{Running the System}
-The whole stack is brought up from the repository with the helper scripts in \texttt{image/moodle-docker/}. \texttt{quick-start.sh} starts the containers and installs the plugins; once Moodle reports as up it is reachable in a browser on the configured host. The two test harnesses are each a single script: \texttt{phpunit.sh} runs the PHPUnit suite and \texttt{behat.sh} runs the Behat acceptance tests. Front-end changes are compiled with \texttt{compile-amd-coderunner.sh}. Fuller setup notes, including prerequisites and host configuration, are in the repository's \texttt{README}.
-
-\subsubsection{For Question Authors}
-The author-facing changes are used from the ordinary CodeRunner question editing form. Test cases can now be removed individually with the delete control on each row, and a new question opens with fewer blank rows than upstream. The Precheck option renders in its own column against the correct test case. A ``CodeRunner Documentation'' link at the top of the editing form opens the in-plugin documentation page; that page can be read directly, navigated by its in-page section anchors, or searched by clicking the search bar or pressing \texttt{Ctrl+K} (or \texttt{Cmd+K} on macOS), which opens a search palette that jumps straight to the matching section. The documentation's example pages carry one-click import links: choosing one, then selecting a course, adds the worked-example question straight into that course's question bank.
-
-\subsubsection{For Students}
-The student-facing changes appear on the question attempt page. A layout switcher toggles between the stacked and side-by-side arrangements of the question and answer, and the chosen layout is remembered for the rest of the browsing session. The information panel can be collapsed to reclaim margin space and enlarge the working area.
-
-\subsubsection{Maintenance and Updating}
-Two operational points matter when changing the plugin. First, any edit to a front-end module under \texttt{amd/src/} must be recompiled with \texttt{compile-amd-coderunner.sh} and followed by a Moodle cache purge, because Moodle serves the built module from \texttt{amd/build/}, not the source. Second, changes should be validated by running both harnesses before release, and the plugin version in \texttt{version.php} incremented so that Moodle registers the upgrade. Documentation is maintained simply by adding or editing Markdown files under \texttt{docs/editor/}; no registration step is needed, as pages are discovered at request time.
+The full user guide, covering how to run the system and how to use the author- and student-facing features the project delivers, is provided online rather than inline to conserve space. It is hosted alongside the project's deployed instance at \url{https://moodle.skraburski.com}, and fuller setup notes, including prerequisites and host configuration, remain in the repository's \texttt{README}.
 
 \subsection{Appendix D: Ethics Documentation}
 
-Due to page-count limitations, online-only versions of the \emph{participant information sheet} and \emph{consent form} can be found at the links below. Each respective section contains the same file; multiple hosts were used to provide backup sources. Note: the GitHub link may fail to load in the browser preview; if so, download the raw file and open it with a PDF viewer.
-
+Due to page-count limitations, online-only versions of the \emph{participant information sheet} and \emph{consent form} can be found at the links below. Each respective section contains the same file; multiple hosts were used to provide backup sources. 
 \subsubsection{Ethical Approval Form}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{figs/approval.jpg}
+    \includegraphics[width=0.7\textwidth]{figs/approval.jpg}
     \caption{Ethical Approval found on the Strathclyde Ethics page}
     \label{fig:ethicsapproval}
 \end{figure}
