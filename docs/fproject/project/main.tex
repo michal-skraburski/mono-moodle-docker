@@ -96,9 +96,9 @@
 \vspace{5mm}
 \depttext{\deptname}
 \vspace{5mm}
-\datetext{August, 2026}
+\datetext{July, 2026}
 \end{titlepage}
-
+:with
 %--------------------------------
 % Front matter numbering.
 %--------------------------------
@@ -132,8 +132,8 @@
 %Appendices-
 
 \input{sections/abstract}
-
-%\input{sections/declaration}
+\clearpage
+\input{sections/declaration}
 \clearpage
 \input{sections/acknowledgements}  % Uncomment to include this page.
 
@@ -143,8 +143,8 @@
 \setstretch{1.0} % 1.0 line spacing.  
 \clearpage
 \tableofcontents
-%\listoffigures   % Uncomment for a list of figures.
-%\listoftables    % Uncomment for a list of tables.
+\listoffigures   % Uncomment for a list of figures.
+\listoftables    % Uncomment for a list of tables.
 \clearpage
 
 %--------------------------------
@@ -171,10 +171,22 @@
 %--------------------------------
 % Bibliography
 %--------------------------------
+% Reference list set compactly (no entries removed): single-spaced, a smaller
+% font, and tighter inter-entry spacing. No \clearpage before it, so the list
+% flows straight on from the Conclusion rather than starting a fresh page.
 \clearpage
-\setstretch{1.0}  % 1.0 line spacing. 
+\begingroup
+\setstretch{1.0}
+\small
+\let\oldthebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{%
+  \oldthebibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+}
 \bibliographystyle{abbrv}
 \bibliography{bibliography}
+\endgroup
 % add references to the file called bibliography.bib
 \clearpage
 
